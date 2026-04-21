@@ -9,20 +9,20 @@ contract VotingContract {
 
     // Represents one candidate in an election
     struct Candidate {
-        uint256 id; // 1, 2, 3... (matches OnChainIndex in your SQL Candidates table)
+        uint id; // 1, 2, 3... (matches OnChainIndex in your SQL Candidates table)
         string name; // "Alice Khan"
         string party; // "Independent" or party name
-        uint256 voteCount; // increments by 1 every time someone votes for this candidate
+        uint voteCount; // increments by 1 every time someone votes for this candidate
     }
 
     // Represents one election
     struct Election {
-        uint256 id;
+        uint id;
         string title;
-        uint256 startTime; // Unix timestamp — seconds since Jan 1 1970
-        uint256 endTime; // Unix timestamp
+        uint startTime; // Unix timestamp — seconds since Jan 1 1970
+        uint endTime; // Unix timestamp
         bool exists; // used to check if an electionId is valid
-        uint256 candidateCount; // how many candidates are in this election
+        uint candidateCount; // how many candidates are in this election
     }
 
     // ================================================================
@@ -36,46 +36,46 @@ contract VotingContract {
 
     // Total number of elections ever created.
     // Also used as the ID for the next election (auto-increment).
-    uint256 public electionCount;
+    uint public electionCount;
 
     // electionId => Election struct
     // Example: elections[1] gives you the first election's data
-    mapping(uint256 => Election) public elections;
+    mapping(uint => Election) public elections;
 
     // electionId => candidateId => Candidate struct
     // Example: candidates[1][2] gives you candidate #2 in election #1
-    mapping(uint256 => mapping(uint256 => Candidate)) public candidates;
+    mapping(uint => mapping(uint => Candidate)) public candidates;
 
     // electionId => voterAddress => true/false
     // Tracks which wallets are whitelisted for each election.
     // Set to true by registerVoter(). Checked before allowing a vote.
-    mapping(uint256 => mapping(address => bool)) public registeredVoters;
+    mapping(uint => mapping(address => bool)) public registeredVoters;
 
     // electionId => voterAddress => true/false
     // Tracks which wallets have already cast their vote.
     // This is what PREVENTS double voting — once true, castVote() rejects them.
-    mapping(uint256 => mapping(address => bool)) public hasVoted;
+    mapping(uint => mapping(address => bool)) public hasVoted;
 
     // ================================================================
     // EVENTS — blockchain logs that your .NET API listens to
     // ================================================================
 
     // Emitted when admin creates a new election
-    event ElectionCreated(uint256 indexed electionId, string title);
+    event ElectionCreated(uint indexed electionId, string title);
 
     // Emitted when a voter is whitelisted for an election
-    event VoterRegistered(uint256 indexed electionId, address indexed voter);
+    event VoterRegistered(uint indexed electionId, address indexed voter);
 
     // Emitted when a vote is successfully cast
     // Your SignalR hub listens for this to push live updates to Angular
     event VoteCast(
-        uint256 indexed electionId,
-        uint256 indexed candidateId,
+        uint indexed electionId,
+        uint indexed candidateId,
         address indexed voter
     );
 
     // Emitted when an election's time window closes
-    event ElectionClosed(uint256 indexed electionId);
+    event ElectionClosed(uint indexed electionId);
 
     // ================================================================
     // MODIFIERS — reusable condition guards
@@ -88,13 +88,13 @@ contract VotingContract {
     }
 
     // Blocks calls that reference a non-existent electionId
-    modifier electionExists(uint256 _electionId) {
+    modifier electionExists(uint _electionId) {
         require(elections[_electionId].exists, "Election does not exist");
         _;
     }
 
     // Blocks votes outside the election's time window
-    modifier electionActive(uint256 _electionId) {
+    modifier electionActive(uint _electionId) {
         require(
             block.timestamp >= elections[_electionId].startTime,
             "Election has not started yet"
@@ -134,8 +134,8 @@ contract VotingContract {
      */
     function createElection(
         string memory _title,
-        uint256 _startTime,
-        uint256 _endTime,
+        uint _startTime,
+        uint _endTime,
         string[] memory _candidateNames,
         string[] memory _candidateParties
     ) external onlyOwner {
@@ -153,7 +153,7 @@ contract VotingContract {
 
         // Increment counter and use it as the new election's ID
         electionCount++;
-        uint256 electionId = electionCount;
+        uint electionId = electionCount;
 
         // Write the Election struct to blockchain storage
         elections[electionId] = Election({
@@ -166,7 +166,7 @@ contract VotingContract {
         });
 
         // Write each Candidate struct — candidateId starts at 1 (not 0)
-        for (uint256 i = 0; i < _candidateNames.length; i++) {
+        for (uint i = 0; i < _candidateNames.length; i++) {
             candidates[electionId][i + 1] = Candidate({
                 id: i + 1,
                 name: _candidateNames[i],
@@ -188,7 +188,7 @@ contract VotingContract {
      * @param _voter       Ethereum wallet address of the voter
      */
     function registerVoter(
-        uint256 _electionId,
+        uint _electionId,
         address _voter
     ) external onlyOwner electionExists(_electionId) {
         require(
@@ -217,8 +217,8 @@ contract VotingContract {
      * @param _candidateId  Which candidate to vote for (1-based index)
      */
     function castVote(
-        uint256 _electionId,
-        uint256 _candidateId
+        uint _electionId,
+        uint _candidateId
     ) external electionExists(_electionId) electionActive(_electionId) {
         // Check 1: is this wallet on the whitelist?
         require(
@@ -260,7 +260,7 @@ contract VotingContract {
      * Called by VoteService.cs before allowing vote submission.
      */
     function isVoterRegistered(
-        uint256 _electionId,
+        uint _electionId,
         address _voter
     ) external view returns (bool) {
         return registeredVoters[_electionId][_voter];
@@ -271,7 +271,7 @@ contract VotingContract {
      * Called by Angular to show "You have already voted" message.
      */
     function hasVoterVoted(
-        uint256 _electionId,
+        uint _electionId,
         address _voter
     ) external view returns (bool) {
         return hasVoted[_electionId][_voter];
@@ -283,24 +283,20 @@ contract VotingContract {
      * Returns three parallel arrays: ids, names, vote counts.
      */
     function getResults(
-        uint256 _electionId
+        uint _electionId
     )
         external
         view
         electionExists(_electionId)
-        returns (
-            uint256[] memory ids,
-            string[] memory names,
-            uint256[] memory votes
-        )
+        returns (uint[] memory ids, string[] memory names, uint[] memory votes)
     {
-        uint256 count = elections[_electionId].candidateCount;
+        uint count = elections[_electionId].candidateCount;
 
-        ids = new uint256[](count);
+        ids = new uint[](count);
         names = new string[](count);
-        votes = new uint256[](count);
+        votes = new uint[](count);
 
-        for (uint256 i = 0; i < count; i++) {
+        for (uint i = 0; i < count; i++) {
             Candidate memory c = candidates[_electionId][i + 1];
             ids[i] = c.id;
             names[i] = c.name;
@@ -316,16 +312,16 @@ contract VotingContract {
      * Called by Angular to display election details page.
      */
     function getElection(
-        uint256 _electionId
+        uint _electionId
     )
         external
         view
         electionExists(_electionId)
         returns (
             string memory title,
-            uint256 startTime,
-            uint256 endTime,
-            uint256 candidateCount
+            uint startTime,
+            uint endTime,
+            uint candidateCount
         )
     {
         Election memory e = elections[_electionId];
@@ -337,17 +333,17 @@ contract VotingContract {
      * Called by ResultsService.cs per candidate if needed individually.
      */
     function getCandidate(
-        uint256 _electionId,
-        uint256 _candidateId
+        uint _electionId,
+        uint _candidateId
     )
         external
         view
         electionExists(_electionId)
         returns (
-            uint256 id,
+            uint id,
             string memory name,
             string memory party,
-            uint256 voteCount
+            uint voteCount
         )
     {
         Candidate memory c = candidates[_electionId][_candidateId];
