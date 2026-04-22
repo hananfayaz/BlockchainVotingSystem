@@ -7,11 +7,33 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt.Net-Next" Version="4.1.0" />
+    <PackageReference Include="FluentValidation" Version="11.3.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Nethereum.Contracts" Version="4.3.0" />
+    <PackageReference Include="Nethereum.Web3" Version="4.3.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+    <Folder Include="Models\DTOs\Auth\" />
+    <Folder Include="Models\DTOs\Elections\" />
+    <Folder Include="Models\DTOs\Results\" />
+    <Folder Include="Models\DTOs\Vote\" />
+    <Folder Include="Models\Entities\" />
+    <Folder Include="Models\Enums\" />
+    <Folder Include="Data\" />
+    <Folder Include="Hubs\" />
+    <Folder Include="Middleware\" />
+    <Folder Include="Helpers\" />
+    <Folder Include="Services\Interfaces\" />
   </ItemGroup>
 
 </Project>
