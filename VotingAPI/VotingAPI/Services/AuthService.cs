@@ -2,6 +2,7 @@
 using VotingAPI.Data;
 using VotingAPI.Models.DTOs.Auth;
 using VotingAPI.Models.Entities;
+using VotingAPI.Models.Enums;
 using VotingAPI.Services.Interfaces;
 
 namespace VotingAPI.Services
@@ -9,48 +10,106 @@ namespace VotingAPI.Services
     public class AuthService : IAuthService
     {
         private readonly VotingDbContext dbContext;
+        private readonly IJwtService jwtService;
+        private readonly IEmailService emailService;
 
-        public AuthService(VotingDbContext dbContext)
+        public AuthService(VotingDbContext dbContext, IJwtService jwtService, IEmailService emailService)
         {
             this.dbContext = dbContext;
+            this.jwtService = jwtService;
+            this.emailService = emailService;
         }
 
-        public async Task<LoginResponseDTO> Login(LoginRequestDTO loginRequestDTO)
+        public async Task<string> Register(RegisterRequestDTO registerRequest)
         {
-            throw new NotImplementedException();
-        }
-
-        public async Task<RegisterResponseDTO> Register(RegisterRequestDTO registerRequestDTO)
-        {
-            var existingUser = await dbContext.Users.FirstOrDefaultAsync(user => user.Email == registerRequestDTO.Email);
+            var existingUser = await dbContext.Users.FirstOrDefaultAsync(user => user.Email == registerRequest.Email);
 
             if (existingUser != null)
-            {
                 throw new Exception("User with this email already exists.");
-            }
 
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequestDTO.Password);
+            if (registerRequest.Role != UserRole.Candidate && registerRequest.Role != UserRole.Voter)
+                throw new Exception("Invalid role. Only Candidate and Voter roles are allowed for registration.");
 
-            User newUser = new()
+            var otp = new Random().Next(100000, 999999).ToString();
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);
+
+            User user = new()
             {
-                FullName = registerRequestDTO.FullName,
-                Email = registerRequestDTO.Email,
+                FullName = registerRequest.FullName,
+                Email = registerRequest.Email,
                 PasswordHash = hashedPassword,
-                Role = registerRequestDTO.Role,
+                // TODO: EthAddress
+                Role = registerRequest.Role,
+                IsVerified = false,
+                OtpCode = otp,
+                OtpExpiry = DateTime.UtcNow.AddMinutes(10),
                 CreatedAt = DateTime.UtcNow
             };
 
-            await dbContext.Users.AddAsync(newUser);
+            await dbContext.Users.AddAsync(user);
             await dbContext.SaveChangesAsync();
 
-            var response = new RegisterResponseDTO()
-            {
-                FullName = newUser.FullName,
-                Email = newUser.Email,
-                Role = newUser.Role
-            };
+            await emailService.SendEmailAsync(toEmail: user.Email, subject: "OTP Verification", body: $"Your OTP is: {otp}. It expires in 10 minutes.");
 
-            return response;
+            return "Registration successful. OTP sent to email.";
+        }
+
+        public async Task<string> VerifyOtp(VerifyOtpDTO verifyOtpDTO)
+        {
+            var user = dbContext.Users.FirstOrDefault(u => u.Email == verifyOtpDTO.Email) ?? throw new Exception("User not found.");
+
+            if (user.IsVerified)
+                throw new Exception("User already verified.");
+
+            if (user.OtpCode != verifyOtpDTO.Otp)
+                throw new Exception("Invalid OTP.");
+
+            if (user.OtpExpiry < DateTime.UtcNow)
+                throw new Exception("OTP has expired.");
+
+            user.IsVerified = true;
+            user.OtpCode = null;
+            user.OtpExpiry = null;
+
+            await dbContext.SaveChangesAsync();
+            return "Account verified successfully.";
+        }
+
+        public async Task<string> ResendOtp(ResendOtpDTO resendOtpDTO)
+        {
+            var user = dbContext.Users.FirstOrDefault(u => u.Email == resendOtpDTO.Email) ?? throw new Exception("User not found.");
+
+            if (user.IsVerified)
+                throw new Exception("User already verified.");
+
+            var otp = new Random().Next(100000, 999999).ToString();
+
+            user.OtpCode = otp;
+            user.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
+
+            await dbContext.SaveChangesAsync();
+
+            await emailService.SendEmailAsync(toEmail: user.Email, subject: "OTP Verification", body: $"Your new OTP is: {otp}. It expires in 10 minutes.");
+
+            return "OTP resent successfully.";
+        }
+
+        public async Task<string> Login(LoginRequestDTO loginRequestDTO)
+        {
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == loginRequestDTO.Email) ?? throw new Exception("Invalid email or password.");
+
+            if (!BCrypt.Net.BCrypt.Verify(loginRequestDTO.Password, user.PasswordHash))
+                throw new Exception("Invalid email or password.");
+            
+            if (!user.IsVerified)
+                throw new Exception("Account not verified. Please verify your account before logging in.");
+
+            if (loginRequestDTO.Role != user.Role)
+                throw new Exception("Invalid role.");
+
+            var token = jwtService.GenerateToken(user);
+
+            return token;
         }
     }
 }

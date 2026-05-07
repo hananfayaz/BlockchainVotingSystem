@@ -6,7 +6,13 @@
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
-    "Parameters": [],
+    "Parameters": [
+      {
+        "Name": "loginRequestDTO",
+        "Type": "VotingAPI.Models.DTOs.Auth.LoginRequestDTO",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {
@@ -18,8 +24,40 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "registerRequest",
+        "Name": "registerRequestDTO",
         "Type": "VotingAPI.Models.DTOs.Auth.RegisterRequestDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.AuthController",
+    "Method": "ResendOtp",
+    "RelativePath": "api/Auth/ResendOtp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "resendOtpDTO",
+        "Type": "VotingAPI.Models.DTOs.Auth.ResendOtpDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.AuthController",
+    "Method": "VerifyOtp",
+    "RelativePath": "api/Auth/VerifyOtp",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "verifyOtpDTO",
+        "Type": "VotingAPI.Models.DTOs.Auth.VerifyOtpDTO",
         "IsRequired": true
       }
     ],

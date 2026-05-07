@@ -15,21 +15,69 @@ namespace VotingAPI.Controllers
             this.authService = authService;
         }
 
-        [HttpPost("Login")]
-        public IActionResult Login()
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register(RegisterRequestDTO registerRequestDTO)
         {
-            return Ok("Login successful");
+            try
+            {
+                var result = await authService.Register(registerRequestDTO);
+                return Ok(new { message = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
-        [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequestDTO registerRequest)
+        [HttpPost("VerifyOtp")]
+        public async Task<IActionResult> VerifyOtp(VerifyOtpDTO verifyOtpDTO)
         {
-            if (registerRequest != null)
+            try
             {
-                var result = await authService.Register(registerRequest);
-                return Ok(result);
+                var result = await authService.VerifyOtp(verifyOtpDTO);
+                return Ok(new { message = result });
             }
-            return BadRequest("User can't be null");
+            catch(Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("ResendOtp")]
+        public async Task<IActionResult> ResendOtp(ResendOtpDTO resendOtpDTO)
+        {
+            try
+            {
+                var result = await authService.ResendOtp(resendOtpDTO);
+                return Ok(new { message = result });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("Login")]
+        public async Task<IActionResult> Login(LoginRequestDTO loginRequestDTO)
+        {
+            try
+            {
+                var token = await authService.Login(loginRequestDTO);
+
+                Response.Cookies.Append(key: "access_token", value: token, options: new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false,
+                    SameSite = SameSiteMode.Lax,
+                    Expires = DateTime.UtcNow.AddDays(1)
+                });
+
+                return Ok(new { message = "Login successful" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

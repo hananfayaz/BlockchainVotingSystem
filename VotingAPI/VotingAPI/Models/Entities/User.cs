@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VotingAPI.Models.Enums;
 
 namespace VotingAPI.Models.Entities
 {
@@ -8,31 +9,30 @@ namespace VotingAPI.Models.Entities
         public Guid UserId { get; set; }
 
         [Required]
-        [MaxLength(100)]
         public string FullName { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(100)]
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(255)]
         public string PasswordHash { get; set; } = string.Empty;
 
-        [MaxLength(42)]
         public string? EthAddress { get; set; } // Ethereum wallet address
 
         [Required]
-        [MaxLength(20)]
-        public string Role { get; set; } = "Voter";
+        public UserRole Role { get; set; }
 
-        public bool IsVerified { get; set; } = false;
+        public bool IsVerified { get; set; }
+
+        public string? OtpCode { get; set; }
+
+        public DateTime? OtpExpiry {  get; set; }
 
         public DateTime CreatedAt { get; set; }
 
         // Navigation properties
         public ICollection<Election> CreatedElections { get; set; } = [];
         public ICollection<Voter> Voters { get; set; } = [];
-        public ICollection<VoteRecord> VoteRecords { get; set; } = [];
+        public ICollection<VoteTransaction> VoteTransactions { get; set; } = [];
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using VotingAPI.Models.Enums;
 
 namespace VotingAPI.Models.Entities
 {
@@ -9,10 +10,10 @@ namespace VotingAPI.Models.Entities
         public Guid ElectionId { get; set; }
 
         [Required]
-        [MaxLength(200)]
+        [MaxLength(100)]
         public string Title { get; set; } = string.Empty;
 
-        [MaxLength(1000)]
+        [MaxLength(500)]
         public string? Description { get; set; }
 
         [MaxLength(42)]
@@ -25,8 +26,7 @@ namespace VotingAPI.Models.Entities
         public DateTime EndTime { get; set; }
 
         [Required]
-        [MaxLength(20)]
-        public string Status { get; set; } = "Draft";  // Draft | Active | Closed
+        public ElectionStatus Status { get; set; } = ElectionStatus.Draft;
 
         public DateTime CreatedAt { get; set; }
 
@@ -39,6 +39,6 @@ namespace VotingAPI.Models.Entities
 
         public ICollection<Candidate> Candidates { get; set; } = [];
         public ICollection<Voter> Voters { get; set; } = [];
-        public ICollection<VoteRecord> VoteRecords { get; set; } = [];
+        public ICollection<VoteTransaction> VoteTransactions { get; set; } = [];
     }
 }

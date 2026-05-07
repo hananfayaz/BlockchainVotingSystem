@@ -8,7 +8,7 @@ namespace VotingAPI.Models.Entities
         [Key]
         public Guid ElectionVoterId { get; set; }
 
-        public bool HasVoted { get; set; } = false;     // off-chain mirror of on-chain state
+        public bool HasVoted { get; set; }     // off-chain mirror of on-chain state
 
         public DateTime RegisteredAt { get; set; }
 

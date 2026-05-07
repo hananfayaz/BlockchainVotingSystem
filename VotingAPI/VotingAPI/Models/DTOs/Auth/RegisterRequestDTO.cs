@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VotingAPI.Models.Enums;
 
 namespace VotingAPI.Models.DTOs.Auth
 {
@@ -20,6 +21,6 @@ namespace VotingAPI.Models.DTOs.Auth
         public string ConfirmPassword { get; set; } = string.Empty;
 
         [Required]
-        public string Role { get; set; } = string.Empty;
+        public UserRole Role { get; set; }
     }
 }

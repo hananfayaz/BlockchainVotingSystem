@@ -11,7 +11,7 @@ namespace VotingAPI.Data
         public DbSet<Election> Elections { get; set; }
         public DbSet<Candidate> Candidates { get; set; }
         public DbSet<Voter> Voters { get; set; }
-        public DbSet<VoteRecord> VoteRecords { get; set; }
+        public DbSet<VoteTransaction> VoteTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,12 +37,12 @@ namespace VotingAPI.Data
                 .HasForeignKey(v => v.UserId)
                 .OnDelete(DeleteBehavior.Restrict); // Voter table is already deleted via Election cascade, so User must not also cascade delete it
 
-            // User → VoteRecords
+            // User → VoteTransactions
             modelBuilder.Entity<User>()
-                .HasMany(u => u.VoteRecords)
+                .HasMany(u => u.VoteTransactions)
                 .WithOne(vr => vr.User)
                 .HasForeignKey(vr => vr.UserId)
-                .OnDelete(DeleteBehavior.Restrict); // VoteRecords are permanent audit logs, never auto-delete
+                .OnDelete(DeleteBehavior.Restrict); // VoteTransactions are permanent audit logs, never auto-delete
 
             // ── Election ─────────────────────────────────────────────────
 
@@ -58,21 +58,21 @@ namespace VotingAPI.Data
                 .WithOne(v => v.Election)
                 .HasForeignKey(v => v.ElectionId);
 
-            // Election → VoteRecords
+            // Election → VoteTransactions
             modelBuilder.Entity<Election>()
-                .HasMany(e => e.VoteRecords)
+                .HasMany(e => e.VoteTransactions)
                 .WithOne(vr => vr.Election)
                 .HasForeignKey(vr => vr.ElectionId)
-                .OnDelete(DeleteBehavior.Restrict); // VoteRecords are permanent audit logs, never auto-delete, even if election is deleted
+                .OnDelete(DeleteBehavior.Restrict); // VoteTransactions are permanent audit logs, never auto-delete, even if election is deleted
 
             // ── Candidate ────────────────────────────────────────────────
 
-            // Candidate → VoteRecords
+            // Candidate → VoteTransactions
             modelBuilder.Entity<Candidate>()
-                .HasMany(c => c.VoteRecords)
+                .HasMany(c => c.VoteTransactions)
                 .WithOne(vr => vr.Candidate)
                 .HasForeignKey(vr => vr.CandidateId)
-                .OnDelete(DeleteBehavior.Restrict); // VoteRecords are permanent audit logs, never auto-delete, even if candidate is deleted
+                .OnDelete(DeleteBehavior.Restrict); // VoteTransactions are permanent audit logs, never auto-delete, even if candidate is deleted
 
             // ── Voter ────────────────────────────────────────────────────
 
@@ -80,11 +80,11 @@ namespace VotingAPI.Data
                 .HasIndex(v => new { v.ElectionId, v.UserId })
                 .IsUnique(); // Ensure a user can only be a voter once per election (one voter per election)
 
-            // ── VoteRecord ───────────────────────────────────────────────
+            // ── VoteTransaction ───────────────────────────────────────────────
 
-            modelBuilder.Entity<VoteRecord>()
+            modelBuilder.Entity<VoteTransaction>()
                 .HasIndex(vr => new { vr.ElectionId, vr.UserId })
-                .IsUnique(); // Ensure a user can only vote once per election (one vote record per election per user) => (one vote per user per election)
+                .IsUnique(); // Ensure a user can only vote once per election (one vote transaction per election per user) => (one vote per user per election)
         }
     }
 }
