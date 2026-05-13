@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\DTOs\Elections\" />
     <Folder Include="Models\DTOs\Results\" />
     <Folder Include="Models\DTOs\Vote\" />
     <Folder Include="Hubs\" />

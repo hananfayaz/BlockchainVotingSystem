@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using VotingAPI.Models.DTOs.Auth;
 using VotingAPI.Services.Interfaces;
 
@@ -73,6 +74,32 @@ namespace VotingAPI.Controllers
                 });
 
                 return Ok(new { message = "Login successful" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpPost("Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                var token = Request.Cookies["access_token"];
+                if (token != null)
+                {
+                    var revokeToken = token.Contains("RevokeToken");
+                    await authService.Logout(revokeToken);
+                }
+                Response.Cookies.Delete("access_token", new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = false,
+                    SameSite = SameSiteMode.Lax,
+                });
+                return Ok(new { message = "Logout successful" , token });
             }
             catch (Exception ex)
             {

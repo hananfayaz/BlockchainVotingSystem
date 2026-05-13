@@ -24,6 +24,8 @@ namespace VotingAPI.Models.Entities
 
         public bool IsVerified { get; set; }
 
+        public bool RevokeToken { get; set; } = false;
+
         public string? OtpCode { get; set; }
 
         public DateTime? OtpExpiry {  get; set; }

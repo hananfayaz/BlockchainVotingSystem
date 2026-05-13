@@ -26,7 +26,7 @@ namespace VotingAPI.Models.Entities
         public DateTime EndTime { get; set; }
 
         [Required]
-        public ElectionStatus Status { get; set; } = ElectionStatus.Draft;
+        public ElectionStatus Status { get; set; } // By default, it will be set to "Draft" when the election is created, and will be updated to "Active" when the election starts, and "Closed" when the election ends.
 
         public DateTime CreatedAt { get; set; }
 

@@ -56,7 +56,7 @@ namespace VotingAPI.Services
 
         public async Task<string> VerifyOtp(VerifyOtpDTO verifyOtpDTO)
         {
-            var user = dbContext.Users.FirstOrDefault(u => u.Email == verifyOtpDTO.Email) ?? throw new Exception("User not found.");
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == verifyOtpDTO.Email) ?? throw new Exception("User not found.");
 
             if (user.IsVerified)
                 throw new Exception("User already verified.");
@@ -77,10 +77,13 @@ namespace VotingAPI.Services
 
         public async Task<string> ResendOtp(ResendOtpDTO resendOtpDTO)
         {
-            var user = dbContext.Users.FirstOrDefault(u => u.Email == resendOtpDTO.Email) ?? throw new Exception("User not found.");
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == resendOtpDTO.Email) ?? throw new Exception("User not found.");
 
             if (user.IsVerified)
                 throw new Exception("User already verified.");
+
+            if (user.OtpExpiry > DateTime.UtcNow)
+                throw new Exception("Current OTP is still valid. Please wait before requesting a new one.");
 
             var otp = new Random().Next(100000, 999999).ToString();
 
@@ -100,7 +103,10 @@ namespace VotingAPI.Services
 
             if (!BCrypt.Net.BCrypt.Verify(loginRequestDTO.Password, user.PasswordHash))
                 throw new Exception("Invalid email or password.");
-            
+
+            if (user.RevokeToken)
+                throw new Exception("Token has been revoked. Please log in again.");
+
             if (!user.IsVerified)
                 throw new Exception("Account not verified. Please verify your account before logging in.");
 
@@ -110,6 +116,15 @@ namespace VotingAPI.Services
             var token = jwtService.GenerateToken(user);
 
             return token;
+        }
+
+        public async Task<string> Logout(bool revokeToken)
+        {
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.RevokeToken == revokeToken) ?? throw new Exception("User not found.");
+
+            user.RevokeToken = true;
+            await dbContext.SaveChangesAsync();
+            return "Logged out successfully.";
         }
     }
 }

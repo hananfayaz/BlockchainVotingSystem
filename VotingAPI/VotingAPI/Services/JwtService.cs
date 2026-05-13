@@ -20,6 +20,7 @@ namespace VotingAPI.Services
         {
             var claims = new[]
             {
+                new Claim("RevokeToken", user.RevokeToken.ToString()),
                 new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
                 new Claim(ClaimTypes.Name, user.FullName),
                 new Claim(ClaimTypes.Email, user.Email),
