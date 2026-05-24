@@ -655,7 +655,8 @@
           },
           "email": {
             "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "format": "email"
           },
           "password": {
             "minLength": 1,
@@ -667,8 +668,7 @@
       "LoginRequestDTO": {
         "required": [
           "email",
-          "password",
-          "role"
+          "password"
         ],
         "type": "object",
         "properties": {

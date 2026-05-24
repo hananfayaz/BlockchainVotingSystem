@@ -35,7 +35,8 @@ namespace VotingAPI.Controllers
                 Expires = DateTime.UtcNow.AddDays(1)
             });
 
-            return Ok(new { message = "Login successful" });
+            //return Ok(new { message = "Login successful" });
+            return Ok(token);
         }
 
         [HttpPost("verify-otp")]

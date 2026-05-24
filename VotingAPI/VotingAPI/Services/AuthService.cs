@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
 using VotingAPI.Data;
+using VotingAPI.Helpers;
 using VotingAPI.Models.DTOs.Auth;
 using VotingAPI.Models.Entities;
 using VotingAPI.Models.Enums;
@@ -28,14 +28,14 @@ namespace VotingAPI.Services
             if (existingUser != null)
                 throw new ArgumentException("User with this email already exists.");
 
-            var otp = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password);
+            var otp = EmailHelper.GetOtp();
+            var body = EmailHelper.GetBody(registerRequest.FullName, otp);
 
             User user = new()
             {
                 FullName = registerRequest.FullName,
                 Email = registerRequest.Email,
-                PasswordHash = hashedPassword,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerRequest.Password),
                 EthAddress = null,
                 Role = UserRole.Voter,
                 IsVerified = false,
@@ -47,7 +47,7 @@ namespace VotingAPI.Services
             await dbContext.Users.AddAsync(user);
             await dbContext.SaveChangesAsync();
 
-            await emailService.SendEmailAsync(toEmail: user.Email, subject: "OTP Verification", body: $"Your OTP is: {otp}. It expires in 10 minutes.");
+            await emailService.SendEmailAsync(toEmail: user.Email, subject: "OTP Verification", body: body);
 
             return "Registration successful. OTP sent to email.";
         }
@@ -83,27 +83,28 @@ namespace VotingAPI.Services
             if (user.OtpExpiry > DateTime.UtcNow)
                 throw new ArgumentException("Current OTP is still valid. Please wait before requesting a new one.");
 
-            var otp = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
+            var otp = EmailHelper.GetOtp();
+            var body = EmailHelper.GetBody(user.FullName, otp);
 
             user.OtpCode = otp;
             user.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
 
             await dbContext.SaveChangesAsync();
 
-            await emailService.SendEmailAsync(toEmail: user.Email, subject: "OTP Verification", body: $"Your new OTP is: {otp}. It expires in 10 minutes.");
+            await emailService.SendEmailAsync(toEmail: user.Email, subject: "OTP Verification", body: body);
 
             return "OTP resent successfully.";
         }
 
         public async Task<string> Login(LoginRequestDTO loginRequestDTO)
         {
-            var user = await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == loginRequestDTO.Email);
+            var user = await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == loginRequestDTO.Email) ?? throw new KeyNotFoundException("User not found");
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginRequestDTO.Password, user.PasswordHash))
                 throw new InvalidOperationException("Invalid credentials.");
 
             if (!user.IsVerified)
-                throw new ArgumentException("Account not verified. Please verify your account before logging in.");
+                throw new UnauthorizedAccessException("Account not verified. Please verify your account before logging in.");
 
             if (loginRequestDTO.Role != user.Role)
                 throw new InvalidOperationException("Invalid role.");

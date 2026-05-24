@@ -13,7 +13,6 @@ namespace VotingAPI.Models.DTOs.Auth
         [MinLength(6, ErrorMessage = "Password must be at least 6 characters long")]
         public string Password { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Role is required.")]
-        public UserRole Role { get; set; } = UserRole.Voter;
+        public UserRole Role { get; set; }
     }
 }

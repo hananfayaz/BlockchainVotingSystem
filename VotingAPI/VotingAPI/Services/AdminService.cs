@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VotingAPI.Data;
+using VotingAPI.Helpers;
 using VotingAPI.Models.DTOs.Admin;
 using VotingAPI.Models.Entities;
 using VotingAPI.Models.Enums;
@@ -10,10 +11,12 @@ namespace VotingAPI.Services
     public class AdminService : IAdminService
     {
         private readonly VotingDbContext dbContext;
+        private readonly IEmailService emailService;
 
-        public AdminService(VotingDbContext dbContext)
+        public AdminService(VotingDbContext dbContext, IEmailService emailService)
         {
             this.dbContext = dbContext;
+            this.emailService = emailService;
         }
 
         public async Task<string> CreateOfficer(CreateOfficerDTO dto)
@@ -21,7 +24,10 @@ namespace VotingAPI.Services
             var officerExists = await dbContext.Users.AnyAsync(u => u.Email == dto.Email);
 
             if (officerExists)
-                throw new InvalidOperationException("Election Officer already exists");
+                throw new InvalidOperationException("User already exists");
+
+            var otp = EmailHelper.GetOtp();
+            var body = EmailHelper.GetBody(dto.FullName, otp);
 
             var officer = new User
             {
@@ -29,14 +35,16 @@ namespace VotingAPI.Services
                 Email = dto.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Role = UserRole.ElectionOfficer,
-                IsVerified = true,
+                IsVerified = false,
                 CreatedAt = DateTime.UtcNow
             };
 
             await dbContext.Users.AddAsync(officer);
             await dbContext.SaveChangesAsync();
 
-            return "Officer created successfully";
+            await emailService.SendEmailAsync(officer.Email, subject: "OTP Verification", body: body);
+
+            return "Registration successful. OTP sent to email.";
         }
     }
 }

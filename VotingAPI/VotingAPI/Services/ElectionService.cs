@@ -60,8 +60,11 @@ namespace VotingAPI.Services
             if (createElectionDTO.StartTime >= createElectionDTO.EndTime)
                 throw new ArgumentException("Invalid election time range");
 
+            if (createElectionDTO.StartTime < DateTime.UtcNow)
+                throw new ArgumentException("Start Time cannot be in the past");
+
             if (createElectionDTO.EndTime < DateTime.UtcNow)
-                throw new ArgumentException("Election cannot be in the past");
+                throw new ArgumentException("End Time cannot be in the past");
 
             var election = new Election
             {
@@ -90,11 +93,17 @@ namespace VotingAPI.Services
             if (election.Candidates.Count < 2)
                 throw new ArgumentException("At least 2 candidates required");
 
-            if (election.StartTime > DateTime.UtcNow)
-                throw new ArgumentException("Voting cannot be started before start time");
-
             if (election.EndTime <= DateTime.UtcNow)
                 throw new ArgumentException("Cannot activate already expired election");
+
+            if (election.StartTime > DateTime.UtcNow)
+                throw new ArgumentException("Voting cannot be started before its scheduled start time");
+
+            foreach (var voter in election.Voters)
+            {
+                if (string.IsNullOrWhiteSpace(voter.User.EthAddress))
+                    throw new ArgumentException($"Voter {voter.User.FullName} has no wallet connected");
+            }
 
             var candidateList = election.Candidates.OrderBy(c => c.CreatedAt).ToList();
             var candidates = candidateList.Select(c => c.Name).ToList();
@@ -112,13 +121,8 @@ namespace VotingAPI.Services
                 await blockchainService.GrantBallotAdminRoleAsync(votingContractAddress);
 
                 foreach (var voter in election.Voters)
-                {
-                    var walletAddress = voter.User.EthAddress;
-
-                    if (string.IsNullOrWhiteSpace(walletAddress))
-                        throw new ArgumentException($"Voter {voter.User.FullName} has no wallet connected");
-
-                    await blockchainService.SetEligibilityAsync(votingContractAddress, walletAddress);
+                { 
+                    await blockchainService.SetEligibilityAsync(votingContractAddress, voter.User.EthAddress!);
                 }
 
                 election.ContractAddress = votingContractAddress;
