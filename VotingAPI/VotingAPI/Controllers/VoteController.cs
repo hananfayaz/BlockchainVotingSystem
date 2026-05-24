@@ -9,6 +9,7 @@ namespace VotingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class VoteController : ControllerBase
     {
         private readonly IVoteService voteService;
@@ -18,22 +19,19 @@ namespace VotingAPI.Controllers
             this.voteService = voteService;
         }
 
-        [Authorize]
-        [HttpPost("Prepare")]
+        [HttpPost("prepare")]
         public async Task<IActionResult> PrepareVote([FromBody] VotePrepareRequestDTO votePrepareRequestDTO)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException("Not logged in");
 
             var result = await voteService.PrepareVote(Guid.Parse(userId!), votePrepareRequestDTO);
             return Ok(new { message = result });
         }
 
-
-        [Authorize]
-        [HttpPost("Confirm")]
+        [HttpPost("confirm")]
         public async Task<IActionResult> ConfirmVote([FromBody] ConfirmVoteDTO confirmVoteDTO)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException("Not logged in");
 
             await voteService.ConfirmVote(Guid.Parse(userId!), confirmVoteDTO);
             return Ok(new { message = "Vote stored successfully" });

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace VotingAPI.Migrations
+namespace VotingAPI.Data.Migrations
 {
     /// <inheritdoc />
     public partial class VotingMigration : Migration

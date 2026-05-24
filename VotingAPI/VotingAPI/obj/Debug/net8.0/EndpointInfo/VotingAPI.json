@@ -5,7 +5,38 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/Auth/Register": {
+    "/api/admin/create-officer": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOfficerDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOfficerDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOfficerDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
       "post": {
         "tags": [
           "Auth"
@@ -36,7 +67,7 @@
         }
       }
     },
-    "/api/Auth/Login": {
+    "/api/auth/login": {
       "post": {
         "tags": [
           "Auth"
@@ -67,7 +98,7 @@
         }
       }
     },
-    "/api/Auth/VerifyOtp": {
+    "/api/auth/verify-otp": {
       "post": {
         "tags": [
           "Auth"
@@ -98,7 +129,7 @@
         }
       }
     },
-    "/api/Auth/ResendOtp": {
+    "/api/auth/resend-otp": {
       "post": {
         "tags": [
           "Auth"
@@ -129,7 +160,7 @@
         }
       }
     },
-    "/api/Elections": {
+    "/api/elections": {
       "get": {
         "tags": [
           "Elections"
@@ -170,14 +201,14 @@
         }
       }
     },
-    "/api/Elections/{id}": {
+    "/api/elections/{electionId}": {
       "get": {
         "tags": [
           "Elections"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "electionId",
             "in": "path",
             "required": true,
             "schema": {
@@ -193,14 +224,14 @@
         }
       }
     },
-    "/api/Elections/{id}/activate": {
+    "/api/elections/{electionId}/activate": {
       "put": {
         "tags": [
           "Elections"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "electionId",
             "in": "path",
             "required": true,
             "schema": {
@@ -216,14 +247,14 @@
         }
       }
     },
-    "/api/Elections/{id}/close": {
+    "/api/elections/{electionId}/close": {
       "put": {
         "tags": [
           "Elections"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "electionId",
             "in": "path",
             "required": true,
             "schema": {
@@ -239,14 +270,14 @@
         }
       }
     },
-    "/api/Elections/{id}/candidates": {
+    "/api/elections/{electionId}/candidates": {
       "post": {
         "tags": [
           "Elections"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "electionId",
             "in": "path",
             "required": true,
             "schema": {
@@ -286,7 +317,7 @@
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "electionId",
             "in": "path",
             "required": true,
             "schema": {
@@ -302,14 +333,14 @@
         }
       }
     },
-    "/api/Elections/{id}/candidates/{candidateId}": {
+    "/api/elections/{electionId}/candidates/{candidateId}": {
       "delete": {
         "tags": [
           "Elections"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "electionId",
             "in": "path",
             "required": true,
             "schema": {
@@ -334,7 +365,7 @@
         }
       }
     },
-    "/api/Results/{electionId}": {
+    "/api/results/{electionId}": {
       "get": {
         "tags": [
           "Results"
@@ -357,7 +388,7 @@
         }
       }
     },
-    "/api/Results/{electionId}/audit": {
+    "/api/results/{electionId}/audit": {
       "get": {
         "tags": [
           "Results"
@@ -380,7 +411,7 @@
         }
       }
     },
-    "/api/Users": {
+    "/api/users": {
       "get": {
         "tags": [
           "Users"
@@ -392,7 +423,7 @@
         }
       }
     },
-    "/api/Users/Connect-Wallet": {
+    "/api/users/connect-wallet": {
       "post": {
         "tags": [
           "Users"
@@ -413,7 +444,7 @@
         }
       }
     },
-    "/api/Vote/Prepare": {
+    "/api/vote/prepare": {
       "post": {
         "tags": [
           "Vote"
@@ -444,7 +475,7 @@
         }
       }
     },
-    "/api/Vote/Confirm": {
+    "/api/vote/confirm": {
       "post": {
         "tags": [
           "Vote"
@@ -475,7 +506,7 @@
         }
       }
     },
-    "/api/Voters/Register": {
+    "/api/voters/register": {
       "post": {
         "tags": [
           "Voters"
@@ -505,14 +536,14 @@
         }
       }
     },
-    "/api/Voters/{id}": {
+    "/api/voters/{electionId}": {
       "get": {
         "tags": [
           "Voters"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "electionId",
             "in": "path",
             "required": true,
             "schema": {
@@ -606,6 +637,29 @@
           "endTime": {
             "type": "string",
             "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateOfficerDTO": {
+        "required": [
+          "email",
+          "fullName",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "password": {
+            "minLength": 1,
+            "type": "string"
           }
         },
         "additionalProperties": false

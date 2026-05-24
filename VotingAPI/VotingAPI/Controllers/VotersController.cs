@@ -8,6 +8,7 @@ namespace VotingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.ElectionOfficer)}")]
     public class VotersController : ControllerBase
     {
         private readonly IVoterService voterService;
@@ -17,19 +18,17 @@ namespace VotingAPI.Controllers
             this.voterService = voterService;
         }
 
-        [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.ElectionOfficer)}")]
-        [HttpPost("Register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register(Guid ElectionId, Guid UserId)
         {
             var result = await voterService.RegisterVoter(ElectionId, UserId);
             return Ok(new { message = result });
         }
 
-        [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.ElectionOfficer)}")]
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetVoters(Guid id)
+        [HttpGet("{electionId:guid}")]
+        public async Task<IActionResult> GetVoters(Guid electionId)
         {
-            var result = await voterService.GetElectionVoters(id);
+            var result = await voterService.GetElectionVoters(electionId);
             return Ok(result);
         }
     }

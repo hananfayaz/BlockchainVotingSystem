@@ -9,10 +9,10 @@ using VotingAPI.Data;
 
 #nullable disable
 
-namespace VotingAPI.Migrations
+namespace VotingAPI.Data.Migrations
 {
     [DbContext(typeof(VotingDbContext))]
-    [Migration("20260523161252_Voting Migration")]
+    [Migration("20260524073831_VotingMigration")]
     partial class VotingMigration
     {
         /// <inheritdoc />

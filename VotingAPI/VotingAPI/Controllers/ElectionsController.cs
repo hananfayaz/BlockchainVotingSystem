@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using VotingAPI.Models.DTOs.Election;
 using VotingAPI.Models.Enums;
@@ -10,6 +11,7 @@ namespace VotingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ElectionsController : ControllerBase
     {
         private readonly IElectionService electionService;
@@ -19,7 +21,6 @@ namespace VotingAPI.Controllers
             this.electionService = electionService;
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllElections()
         {
@@ -27,11 +28,10 @@ namespace VotingAPI.Controllers
             return Ok(new { elections });
         }
 
-        [Authorize]
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetElectionById(Guid id)
+        [HttpGet("{electionId:guid}")]
+        public async Task<IActionResult> GetElectionById(Guid electionId)
         {
-            var election = await electionService.GetElectionById(id);
+            var election = await electionService.GetElectionById(electionId);
             return Ok(new { election });
         }
 
@@ -39,49 +39,48 @@ namespace VotingAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateElection([FromBody] CreateElectionDTO createElectionDTO)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? throw new KeyNotFoundException("User not found");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException("User not found");
 
             var result = await electionService.CreateElection(createElectionDTO, Guid.Parse(userId));
             return Ok(new { message = result });
         }
 
         [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.ElectionOfficer)}")]
-        [HttpPut("{id}/activate")]
-        public async Task<IActionResult> ActivateElection(Guid id)
+        [HttpPut("{electionId:guid}/activate")]
+        public async Task<IActionResult> ActivateElection(Guid electionId)
         {
-            var result = await electionService.ActivateElection(id);
+            var result = await electionService.ActivateElection(electionId);
             return Ok(new { message = result });
         }
 
         [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.ElectionOfficer)}")]
-        [HttpPut("{id}/close")]
-        public async Task<IActionResult> CloseElection(Guid id)
+        [HttpPut("{electionId:guid}/close")]
+        public async Task<IActionResult> CloseElection(Guid electionId)
         {
-            var result = await electionService.CloseElection(id);
+            var result = await electionService.CloseElection(electionId);
             return Ok(new { message = result });
         }
 
         [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.ElectionOfficer)}")]
-        [HttpPost("{id}/candidates")]
-        public async Task<IActionResult> AddCandidate(Guid id, [FromBody] AddCandidateDTO addCandidateDTO)
+        [HttpPost("{electionId:guid}/candidates")]
+        public async Task<IActionResult> AddCandidate(Guid electionId, [FromBody] AddCandidateDTO addCandidateDTO)
         {
-            var result = await electionService.AddCandidate(id, addCandidateDTO);
+            var result = await electionService.AddCandidate(electionId, addCandidateDTO);
             return Ok(new { message = result });
         }
 
         [Authorize(Roles = nameof(UserRole.Admin))]
-        [HttpDelete("{id}/candidates/{candidateId}")]
-        public async Task<IActionResult> RemoveCandidate(Guid id, Guid candidateId)
+        [HttpDelete("{electionId:guid}/candidates/{candidateId:guid}")]
+        public async Task<IActionResult> RemoveCandidate(Guid electionId, Guid candidateId)
         {
-            var result = await electionService.RemoveCandidate(id, candidateId);
+            var result = await electionService.RemoveCandidate(electionId, candidateId);
             return Ok(new { message = result });
         }
 
-        [Authorize]
-        [HttpGet("{id}/candidates")]
-        public async Task<IActionResult> GetCandidates(Guid id)
+        [HttpGet("{electionId:guid}/candidates")]
+        public async Task<IActionResult> GetCandidates(Guid electionId)
         {
-            var result = await electionService.GetCandidates(id);
+            var result = await electionService.GetCandidates(electionId);
             return Ok(new { message = result });
         }
     }

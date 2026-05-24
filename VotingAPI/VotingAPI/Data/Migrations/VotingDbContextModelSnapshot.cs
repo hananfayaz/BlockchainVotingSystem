@@ -8,7 +8,7 @@ using VotingAPI.Data;
 
 #nullable disable
 
-namespace VotingAPI.Migrations
+namespace VotingAPI.Data.Migrations
 {
     [DbContext(typeof(VotingDbContext))]
     partial class VotingDbContextModelSnapshot : ModelSnapshot

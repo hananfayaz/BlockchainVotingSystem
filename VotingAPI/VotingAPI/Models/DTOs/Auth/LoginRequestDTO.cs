@@ -14,6 +14,6 @@ namespace VotingAPI.Models.DTOs.Auth
         public string Password { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Role is required.")]
-        public UserRole Role { get; set; }
+        public UserRole Role { get; set; } = UserRole.Voter;
     }
 }

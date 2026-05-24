@@ -1,8 +1,24 @@
 [
   {
+    "ContainingType": "VotingAPI.Controllers.AdminController",
+    "Method": "CreateOfficer",
+    "RelativePath": "api/admin/create-officer",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "VotingAPI.Models.DTOs.Admin.CreateOfficerDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "VotingAPI.Controllers.AuthController",
     "Method": "Login",
-    "RelativePath": "api/Auth/Login",
+    "RelativePath": "api/auth/login",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -18,7 +34,7 @@
   {
     "ContainingType": "VotingAPI.Controllers.AuthController",
     "Method": "Register",
-    "RelativePath": "api/Auth/Register",
+    "RelativePath": "api/auth/register",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -34,7 +50,7 @@
   {
     "ContainingType": "VotingAPI.Controllers.AuthController",
     "Method": "ResendOtp",
-    "RelativePath": "api/Auth/ResendOtp",
+    "RelativePath": "api/auth/resend-otp",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -50,7 +66,7 @@
   {
     "ContainingType": "VotingAPI.Controllers.AuthController",
     "Method": "VerifyOtp",
-    "RelativePath": "api/Auth/VerifyOtp",
+    "RelativePath": "api/auth/verify-otp",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -66,7 +82,7 @@
   {
     "ContainingType": "VotingAPI.Controllers.ElectionsController",
     "Method": "GetAllElections",
-    "RelativePath": "api/Elections",
+    "RelativePath": "api/elections",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -76,7 +92,7 @@
   {
     "ContainingType": "VotingAPI.Controllers.ElectionsController",
     "Method": "CreateElection",
-    "RelativePath": "api/Elections",
+    "RelativePath": "api/elections",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -92,13 +108,13 @@
   {
     "ContainingType": "VotingAPI.Controllers.ElectionsController",
     "Method": "GetElectionById",
-    "RelativePath": "api/Elections/{id}",
+    "RelativePath": "api/elections/{electionId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "electionId",
         "Type": "System.Guid",
         "IsRequired": true
       }
@@ -108,13 +124,13 @@
   {
     "ContainingType": "VotingAPI.Controllers.ElectionsController",
     "Method": "ActivateElection",
-    "RelativePath": "api/Elections/{id}/activate",
+    "RelativePath": "api/elections/{electionId}/activate",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "electionId",
         "Type": "System.Guid",
         "IsRequired": true
       }
@@ -124,13 +140,13 @@
   {
     "ContainingType": "VotingAPI.Controllers.ElectionsController",
     "Method": "AddCandidate",
-    "RelativePath": "api/Elections/{id}/candidates",
+    "RelativePath": "api/elections/{electionId}/candidates",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "electionId",
         "Type": "System.Guid",
         "IsRequired": true
       },
@@ -145,13 +161,13 @@
   {
     "ContainingType": "VotingAPI.Controllers.ElectionsController",
     "Method": "GetCandidates",
-    "RelativePath": "api/Elections/{id}/candidates",
+    "RelativePath": "api/elections/{electionId}/candidates",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "electionId",
         "Type": "System.Guid",
         "IsRequired": true
       }
@@ -161,13 +177,13 @@
   {
     "ContainingType": "VotingAPI.Controllers.ElectionsController",
     "Method": "RemoveCandidate",
-    "RelativePath": "api/Elections/{id}/candidates/{candidateId}",
+    "RelativePath": "api/elections/{electionId}/candidates/{candidateId}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "electionId",
         "Type": "System.Guid",
         "IsRequired": true
       },
@@ -182,13 +198,13 @@
   {
     "ContainingType": "VotingAPI.Controllers.ElectionsController",
     "Method": "CloseElection",
-    "RelativePath": "api/Elections/{id}/close",
+    "RelativePath": "api/elections/{electionId}/close",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "electionId",
         "Type": "System.Guid",
         "IsRequired": true
       }
@@ -198,7 +214,7 @@
   {
     "ContainingType": "VotingAPI.Controllers.ResultsController",
     "Method": "GetResults",
-    "RelativePath": "api/Results/{electionId}",
+    "RelativePath": "api/results/{electionId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -214,7 +230,7 @@
   {
     "ContainingType": "VotingAPI.Controllers.ResultsController",
     "Method": "GetAudit",
-    "RelativePath": "api/Results/{electionId}/audit",
+    "RelativePath": "api/results/{electionId}/audit",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -230,7 +246,7 @@
   {
     "ContainingType": "VotingAPI.Controllers.UsersController",
     "Method": "GetAllUsers",
-    "RelativePath": "api/Users",
+    "RelativePath": "api/users",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -240,7 +256,7 @@
   {
     "ContainingType": "VotingAPI.Controllers.UsersController",
     "Method": "ConnectWallet",
-    "RelativePath": "api/Users/Connect-Wallet",
+    "RelativePath": "api/users/connect-wallet",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -256,7 +272,7 @@
   {
     "ContainingType": "VotingAPI.Controllers.VoteController",
     "Method": "ConfirmVote",
-    "RelativePath": "api/Vote/Confirm",
+    "RelativePath": "api/vote/confirm",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -272,7 +288,7 @@
   {
     "ContainingType": "VotingAPI.Controllers.VoteController",
     "Method": "PrepareVote",
-    "RelativePath": "api/Vote/Prepare",
+    "RelativePath": "api/vote/prepare",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -288,13 +304,13 @@
   {
     "ContainingType": "VotingAPI.Controllers.VotersController",
     "Method": "GetVoters",
-    "RelativePath": "api/Voters/{id}",
+    "RelativePath": "api/voters/{electionId}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "id",
+        "Name": "electionId",
         "Type": "System.Guid",
         "IsRequired": true
       }
@@ -304,7 +320,7 @@
   {
     "ContainingType": "VotingAPI.Controllers.VotersController",
     "Method": "Register",
-    "RelativePath": "api/Voters/Register",
+    "RelativePath": "api/voters/register",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,

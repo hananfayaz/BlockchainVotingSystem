@@ -7,6 +7,7 @@ namespace VotingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ResultsController : ControllerBase
     {
         private readonly IResultService resultService;
@@ -16,8 +17,7 @@ namespace VotingAPI.Controllers
             this.resultService = resultService;
         }
 
-        [Authorize]
-        [HttpGet("{electionId}")]
+        [HttpGet("{electionId:guid}")]
         public async Task<IActionResult> GetResults(Guid electionId)
         {
             var results = await resultService.GetElectionResults(electionId);
@@ -25,7 +25,7 @@ namespace VotingAPI.Controllers
         }
 
         [Authorize(Roles = nameof(UserRole.Admin))]
-        [HttpGet("{electionId}/audit")]
+        [HttpGet("{electionId:guid}/audit")]
         public async Task<IActionResult> GetAudit(Guid electionId)
         {
             var result = await resultService.GetElectionAudit(electionId);

@@ -15,14 +15,14 @@ namespace VotingAPI.Controllers
             this.authService = authService;
         }
 
-        [HttpPost("Register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDTO registerRequestDTO)
         {
             var result = await authService.Register(registerRequestDTO);
             return Ok(new { message = result });
         }
 
-        [HttpPost("Login")]
+        [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequestDTO)
         {
             var token = await authService.Login(loginRequestDTO);
@@ -38,14 +38,14 @@ namespace VotingAPI.Controllers
             return Ok(new { message = "Login successful" });
         }
 
-        [HttpPost("VerifyOtp")]
+        [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDTO verifyOtpDTO)
         {
             var result = await authService.VerifyOtp(verifyOtpDTO);
             return Ok(new { message = result });
         }
 
-        [HttpPost("ResendOtp")]
+        [HttpPost("resend-otp")]
         public async Task<IActionResult> ResendOtp([FromBody] ResendOtpDTO resendOtpDTO)
         {
             var result = await authService.ResendOtp(resendOtpDTO);
