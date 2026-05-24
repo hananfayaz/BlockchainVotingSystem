@@ -12,6 +12,7 @@ namespace VotingAPI.Models.Entities
         public string FullName { get; set; } = string.Empty;
 
         [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
         [Required]
@@ -23,8 +24,6 @@ namespace VotingAPI.Models.Entities
         public UserRole Role { get; set; }
 
         public bool IsVerified { get; set; }
-
-        public bool RevokeToken { get; set; } = false;
 
         public string? OtpCode { get; set; }
 

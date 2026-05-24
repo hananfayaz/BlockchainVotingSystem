@@ -20,8 +20,7 @@ namespace VotingAPI.Services
         {
             var claims = new[]
             {
-                new Claim("RevokeToken", user.RevokeToken.ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
                 new Claim(ClaimTypes.Name, user.FullName),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role.ToString()),
@@ -32,7 +31,7 @@ namespace VotingAPI.Services
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var token = new JwtSecurityToken(issuer: configuration["Jwt:Issuer"], audience: configuration["Jwt:Audience"], claims: claims, notBefore: null, expires: DateTime.Now.AddDays(1), signingCredentials: credentials);
+            var token = new JwtSecurityToken(issuer: configuration["Jwt:Issuer"], audience: configuration["Jwt:Audience"], claims: claims, notBefore: null, expires: DateTime.UtcNow.AddDays(1), signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

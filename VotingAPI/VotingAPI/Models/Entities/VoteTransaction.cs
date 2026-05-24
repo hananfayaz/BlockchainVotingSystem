@@ -6,7 +6,7 @@ namespace VotingAPI.Models.Entities
     public class VoteTransaction
     {
         [Key]
-        public Guid TransactionId { get; set; }
+        public Guid VoteId { get; set; }
 
         [Required]
         [MaxLength(66)]
@@ -18,14 +18,14 @@ namespace VotingAPI.Models.Entities
 
         // Foreign keys
         public Guid ElectionId { get; set; }
-        public Guid UserId { get; set; }
+        public Guid VoterId { get; set; }
         public Guid CandidateId { get; set; }
 
         // Navigation properties
         [ForeignKey("ElectionId")]
         public Election Election { get; set; } = null!;
 
-        [ForeignKey("UserId")]
+        [ForeignKey("VoterId")]
         public User User { get; set; } = null!;
 
         [ForeignKey("CandidateId")]

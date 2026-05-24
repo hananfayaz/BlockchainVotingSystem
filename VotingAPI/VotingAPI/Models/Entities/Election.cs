@@ -36,7 +36,6 @@ namespace VotingAPI.Models.Entities
         // Navigation properties
         [ForeignKey("CreatedBy")]
         public User Creator { get; set; } = null!;
-
         public ICollection<Candidate> Candidates { get; set; } = [];
         public ICollection<Voter> Voters { get; set; } = [];
         public ICollection<VoteTransaction> VoteTransactions { get; set; } = [];

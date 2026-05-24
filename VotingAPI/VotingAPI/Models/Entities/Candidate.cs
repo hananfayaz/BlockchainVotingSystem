@@ -16,7 +16,7 @@ namespace VotingAPI.Models.Entities
         [MaxLength(500)]
         public string? Description { get; set; }
 
-        public int? OnChainIndex { get; set; }          // index in smart contract (1, 2, 3...)
+        public int? OnChainIndex { get; set; } // index in smart contract (1, 2, 3...)
 
         public DateTime CreatedAt { get; set; }
 
@@ -26,7 +26,6 @@ namespace VotingAPI.Models.Entities
         // Navigation properties
         [ForeignKey("ElectionId")]
         public Election Election { get; set; } = null!;
-
         public ICollection<VoteTransaction> VoteTransactions { get; set; } = new List<VoteTransaction>();
     }
 }

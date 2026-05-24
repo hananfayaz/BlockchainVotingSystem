@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using VotingAPI.Models.DTOs.Auth;
 using VotingAPI.Services.Interfaces;
 
@@ -17,94 +16,40 @@ namespace VotingAPI.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register(RegisterRequestDTO registerRequestDTO)
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDTO registerRequestDTO)
         {
-            try
-            {
-                var result = await authService.Register(registerRequestDTO);
-                return Ok(new { message = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpPost("VerifyOtp")]
-        public async Task<IActionResult> VerifyOtp(VerifyOtpDTO verifyOtpDTO)
-        {
-            try
-            {
-                var result = await authService.VerifyOtp(verifyOtpDTO);
-                return Ok(new { message = result });
-            }
-            catch(Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpPost("ResendOtp")]
-        public async Task<IActionResult> ResendOtp(ResendOtpDTO resendOtpDTO)
-        {
-            try
-            {
-                var result = await authService.ResendOtp(resendOtpDTO);
-                return Ok(new { message = result });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var result = await authService.Register(registerRequestDTO);
+            return Ok(new { message = result });
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> Login(LoginRequestDTO loginRequestDTO)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequestDTO)
         {
-            try
-            {
-                var token = await authService.Login(loginRequestDTO);
+            var token = await authService.Login(loginRequestDTO);
 
-                Response.Cookies.Append(key: "access_token", value: token, options: new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = false,
-                    SameSite = SameSiteMode.Lax,
-                    Expires = DateTime.UtcNow.AddDays(1)
-                });
-
-                return Ok(new { message = "Login successful" });
-            }
-            catch (Exception ex)
+            Response.Cookies.Append(key: "access_token", value: token, options: new CookieOptions
             {
-                return BadRequest(new { message = ex.Message });
-            }
+                HttpOnly = true,
+                Secure = false,
+                SameSite = SameSiteMode.Lax,
+                Expires = DateTime.UtcNow.AddDays(1)
+            });
+
+            return Ok(new { message = "Login successful" });
         }
 
-        [Authorize]
-        [HttpPost("Logout")]
-        public async Task<IActionResult> Logout()
+        [HttpPost("VerifyOtp")]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDTO verifyOtpDTO)
         {
-            try
-            {
-                var token = Request.Cookies["access_token"];
-                if (token != null)
-                {
-                    var revokeToken = token.Contains("RevokeToken");
-                    await authService.Logout(revokeToken);
-                }
-                Response.Cookies.Delete("access_token", new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = false,
-                    SameSite = SameSiteMode.Lax,
-                });
-                return Ok(new { message = "Logout successful" , token });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var result = await authService.VerifyOtp(verifyOtpDTO);
+            return Ok(new { message = result });
+        }
+
+        [HttpPost("ResendOtp")]
+        public async Task<IActionResult> ResendOtp([FromBody] ResendOtpDTO resendOtpDTO)
+        {
+            var result = await authService.ResendOtp(resendOtpDTO);
+            return Ok(new { message = result });
         }
     }
 }

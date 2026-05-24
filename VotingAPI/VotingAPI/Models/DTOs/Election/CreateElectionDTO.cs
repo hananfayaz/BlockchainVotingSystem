@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace VotingAPI.Models.DTOs.Elections
+namespace VotingAPI.Models.DTOs.Election
 {
     public class CreateElectionDTO
     {
@@ -10,9 +10,6 @@ namespace VotingAPI.Models.DTOs.Elections
 
         [MaxLength(500, ErrorMessage = "Description cannot exceed 500 characters.")]
         public string? Description { get; set; }
-
-        [MaxLength(42, ErrorMessage = "Contract address cannot exceed 42 characters.")]
-        public string? ContractAddress { get; set; }
 
         [Required(ErrorMessage = "Start time is required.")]
         public DateTime StartTime { get; set; }

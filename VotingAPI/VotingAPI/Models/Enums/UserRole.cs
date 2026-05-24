@@ -2,7 +2,7 @@
 {
     public enum UserRole
     {
-        Candidate,
+        Admin,
         ElectionOfficer,
         Voter
     }

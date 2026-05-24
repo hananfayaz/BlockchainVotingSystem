@@ -62,5 +62,264 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.ElectionsController",
+    "Method": "GetAllElections",
+    "RelativePath": "api/Elections",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.ElectionsController",
+    "Method": "CreateElection",
+    "RelativePath": "api/Elections",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "createElectionDTO",
+        "Type": "VotingAPI.Models.DTOs.Election.CreateElectionDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.ElectionsController",
+    "Method": "GetElectionById",
+    "RelativePath": "api/Elections/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.ElectionsController",
+    "Method": "ActivateElection",
+    "RelativePath": "api/Elections/{id}/activate",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.ElectionsController",
+    "Method": "AddCandidate",
+    "RelativePath": "api/Elections/{id}/candidates",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "addCandidateDTO",
+        "Type": "VotingAPI.Models.DTOs.Election.AddCandidateDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.ElectionsController",
+    "Method": "GetCandidates",
+    "RelativePath": "api/Elections/{id}/candidates",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.ElectionsController",
+    "Method": "RemoveCandidate",
+    "RelativePath": "api/Elections/{id}/candidates/{candidateId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "candidateId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.ElectionsController",
+    "Method": "CloseElection",
+    "RelativePath": "api/Elections/{id}/close",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.ResultsController",
+    "Method": "GetResults",
+    "RelativePath": "api/Results/{electionId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "electionId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.ResultsController",
+    "Method": "GetAudit",
+    "RelativePath": "api/Results/{electionId}/audit",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "electionId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.UsersController",
+    "Method": "GetAllUsers",
+    "RelativePath": "api/Users",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.UsersController",
+    "Method": "ConnectWallet",
+    "RelativePath": "api/Users/Connect-Wallet",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ethAddress",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.VoteController",
+    "Method": "ConfirmVote",
+    "RelativePath": "api/Vote/Confirm",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "confirmVoteDTO",
+        "Type": "VotingAPI.Models.DTOs.Vote.ConfirmVoteDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.VoteController",
+    "Method": "PrepareVote",
+    "RelativePath": "api/Vote/Prepare",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "votePrepareRequestDTO",
+        "Type": "VotingAPI.Models.DTOs.Vote.VotePrepareRequestDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.VotersController",
+    "Method": "GetVoters",
+    "RelativePath": "api/Voters/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "VotingAPI.Controllers.VotersController",
+    "Method": "Register",
+    "RelativePath": "api/Voters/Register",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ElectionId",
+        "Type": "System.Guid",
+        "IsRequired": false
+      },
+      {
+        "Name": "UserId",
+        "Type": "System.Guid",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
   }
 ]

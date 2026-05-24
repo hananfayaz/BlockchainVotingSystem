@@ -23,6 +23,10 @@ namespace VotingAPI.Data
                 .HasIndex(u => u.Email)
                 .IsUnique(); // Ensure email uniqueness at the database level
 
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.EthAddress)
+                .IsUnique(); // Ensure Ethereum address uniqueness at the database level (if provided)
+
             // User → Elections (created by this user)
             modelBuilder.Entity<User>()
                 .HasMany(u => u.CreatedElections)
@@ -40,8 +44,8 @@ namespace VotingAPI.Data
             // User → VoteTransactions
             modelBuilder.Entity<User>()
                 .HasMany(u => u.VoteTransactions)
-                .WithOne(vr => vr.User)
-                .HasForeignKey(vr => vr.UserId)
+                .WithOne(vt => vt.User)
+                .HasForeignKey(vt => vt.VoterId)
                 .OnDelete(DeleteBehavior.Restrict); // VoteTransactions are permanent audit logs, never auto-delete
 
             // ── Election ─────────────────────────────────────────────────
@@ -61,8 +65,8 @@ namespace VotingAPI.Data
             // Election → VoteTransactions
             modelBuilder.Entity<Election>()
                 .HasMany(e => e.VoteTransactions)
-                .WithOne(vr => vr.Election)
-                .HasForeignKey(vr => vr.ElectionId)
+                .WithOne(vt => vt.Election)
+                .HasForeignKey(vt => vt.ElectionId)
                 .OnDelete(DeleteBehavior.Restrict); // VoteTransactions are permanent audit logs, never auto-delete, even if election is deleted
 
             // ── Candidate ────────────────────────────────────────────────
@@ -70,8 +74,8 @@ namespace VotingAPI.Data
             // Candidate → VoteTransactions
             modelBuilder.Entity<Candidate>()
                 .HasMany(c => c.VoteTransactions)
-                .WithOne(vr => vr.Candidate)
-                .HasForeignKey(vr => vr.CandidateId)
+                .WithOne(vt => vt.Candidate)
+                .HasForeignKey(vt => vt.CandidateId)
                 .OnDelete(DeleteBehavior.Restrict); // VoteTransactions are permanent audit logs, never auto-delete, even if candidate is deleted
 
             // ── Voter ────────────────────────────────────────────────────
@@ -83,7 +87,7 @@ namespace VotingAPI.Data
             // ── VoteTransaction ───────────────────────────────────────────────
 
             modelBuilder.Entity<VoteTransaction>()
-                .HasIndex(vr => new { vr.ElectionId, vr.UserId })
+                .HasIndex(vt => new { vt.ElectionId, vt.VoterId })
                 .IsUnique(); // Ensure a user can only vote once per election (one vote transaction per election per user) => (one vote per user per election)
         }
     }

@@ -6,7 +6,7 @@ namespace VotingAPI.Models.Entities
     public class Voter
     {
         [Key]
-        public Guid ElectionVoterId { get; set; }
+        public Guid VoterId { get; set; }
 
         public bool HasVoted { get; set; }     // off-chain mirror of on-chain state
 

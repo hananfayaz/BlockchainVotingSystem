@@ -19,8 +19,5 @@ namespace VotingAPI.Models.DTOs.Auth
         [Required(ErrorMessage = "Confirm password is required.")]
         [Compare("Password", ErrorMessage = "Passwords do not match")]
         public string ConfirmPassword { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "Role is required.")]
-        public UserRole Role { get; set; }
     }
 }

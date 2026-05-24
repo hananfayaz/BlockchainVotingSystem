@@ -23,11 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\DTOs\Results\" />
-    <Folder Include="Models\DTOs\Vote\" />
-    <Folder Include="Hubs\" />
-    <Folder Include="Middleware\" />
-    <Folder Include="Helpers\" />
+    <Folder Include="Services\Blockchain\Generated\" />
   </ItemGroup>
 
 </Project>

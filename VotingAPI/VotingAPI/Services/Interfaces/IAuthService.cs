@@ -8,6 +8,5 @@ namespace VotingAPI.Services.Interfaces
         Task<string> VerifyOtp(VerifyOtpDTO verifyOtpDTO);
         Task<string> ResendOtp(ResendOtpDTO resendOtpDTO);
         Task<string> Login(LoginRequestDTO loginRequestDTO);
-        Task<string> Logout(bool revokeToken);
     }
 }
