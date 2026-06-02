@@ -30,7 +30,7 @@ namespace VotingAPI.Services
 
             var voter = await dbContext.Voters.FirstOrDefaultAsync(v => v.UserId == userId && v.ElectionId == votePrepareRequestDTO.ElectionId) ?? throw new UnauthorizedAccessException("Not registered for election");
 
-            var alreadyVoted = await dbContext.VoteTransactions.AnyAsync(v => v.VoterId == voter.VoterId);
+            var alreadyVoted = await dbContext.VoteTransactions.AnyAsync(vt => vt.VoterId == voter.VoterId);
 
             if (alreadyVoted)
                 throw new InvalidOperationException("Already voted");

@@ -9,7 +9,6 @@ namespace VotingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUserService userService;
@@ -27,6 +26,7 @@ namespace VotingAPI.Controllers
             return Ok(new { message = result });
         }
 
+        [Authorize(Roles = nameof(UserRole.Voter))]
         [HttpPost("connect-wallet")]
         public async Task<IActionResult> ConnectWallet(string ethAddress)
         {

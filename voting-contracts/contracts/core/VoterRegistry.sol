@@ -4,23 +4,27 @@ pragma solidity ^0.8.0;
 import "../security/AccessControl.sol";
 
 contract VoterRegistry {
-
     // ─── Types ───────────────────────────────────────────────
-    enum VoterStatus { Unregistered, Pending, Approved, Revoked }
+    enum VoterStatus {
+        Unregistered,
+        Pending,
+        Approved,
+        Revoked
+    }
 
     struct Voter {
-        address     wallet;
-        string      name;
+        address wallet;
+        string name;
         VoterStatus status;
-        uint256     registeredAt;
-        uint256     approvedAt;
+        uint256 registeredAt;
+        uint256 approvedAt;
     }
 
     // ─── State ───────────────────────────────────────────────
     AccessControl public acl;
 
     mapping(address => Voter) private voters;
-    address[]                 private voterList;
+    address[] private voterList;
 
     mapping(address => mapping(address => bool)) private ballotEligibility;
 
@@ -28,14 +32,15 @@ contract VoterRegistry {
     event VoterRegistered(address indexed voter, string name);
     event VoterApproved(address indexed voter, address indexed approvedBy);
     event VoterRevoked(address indexed voter, address indexed revokedBy);
-    event EligibilitySet(address indexed ballot, address indexed voter, bool eligible);
+    event EligibilitySet(
+        address indexed ballot,
+        address indexed voter,
+        bool eligible
+    );
 
     // ─── Modifiers ───────────────────────────────────────────
     modifier onlyAdmin() {
-        require(
-            acl.hasRole(acl.ADMIN(), msg.sender),
-            "Registry: not admin"
-        );
+        require(acl.hasRole(acl.ADMIN(), msg.sender), "Registry: not admin");
         _;
     }
 
@@ -61,11 +66,11 @@ contract VoterRegistry {
         require(bytes(_name).length > 0, "Name required");
 
         voters[msg.sender] = Voter({
-            wallet:       msg.sender,
-            name:         _name,
-            status:       VoterStatus.Pending,
+            wallet: msg.sender,
+            name: _name,
+            status: VoterStatus.Pending,
             registeredAt: block.timestamp,
-            approvedAt:   0
+            approvedAt: 0
         });
 
         voterList.push(msg.sender);
@@ -75,7 +80,7 @@ contract VoterRegistry {
     // ─── Admin: approval / revocation ────────────────────────
     function approveVoter(address _voter) external onlyAdmin {
         require(voters[_voter].status == VoterStatus.Pending, "Not pending");
-        voters[_voter].status     = VoterStatus.Approved;
+        voters[_voter].status = VoterStatus.Approved;
         voters[_voter].approvedAt = block.timestamp;
         emit VoterApproved(_voter, msg.sender);
     }
@@ -84,7 +89,7 @@ contract VoterRegistry {
         for (uint256 i = 0; i < _voters.length; i++) {
             address v = _voters[i];
             if (voters[v].status == VoterStatus.Pending) {
-                voters[v].status     = VoterStatus.Approved;
+                voters[v].status = VoterStatus.Approved;
                 voters[v].approvedAt = block.timestamp;
                 emit VoterApproved(v, msg.sender);
             }
@@ -101,12 +106,8 @@ contract VoterRegistry {
     function setEligibility(
         address ballot,
         address _voter,
-        bool    _eligible
+        bool _eligible
     ) external onlyBallotAdmin(ballot) {
-        require(
-            voters[_voter].status != VoterStatus.Unregistered,
-            "Unknown voter"
-        );
         ballotEligibility[ballot][_voter] = _eligible;
         emit EligibilitySet(ballot, _voter, _eligible);
     }
@@ -116,9 +117,10 @@ contract VoterRegistry {
         return voters[_voter].status == VoterStatus.Approved;
     }
 
-    function isEligible(address _ballot, address _voter)
-        external view returns (bool)
-    {
+    function isEligible(
+        address _ballot,
+        address _voter
+    ) external view returns (bool) {
         VoterStatus s = voters[_voter].status;
         if (s == VoterStatus.Unregistered || s == VoterStatus.Revoked)
             return false;
@@ -128,13 +130,16 @@ contract VoterRegistry {
         return hasOverride || s == VoterStatus.Approved;
     }
 
-    function getVoter(address _voter)
-        external view
+    function getVoter(
+        address _voter
+    )
+        external
+        view
         returns (
-            string      memory name,
-            VoterStatus        status,
-            uint256            registeredAt,
-            uint256            approvedAt
+            string memory name,
+            VoterStatus status,
+            uint256 registeredAt,
+            uint256 approvedAt
         )
     {
         Voter storage v = voters[_voter];
@@ -145,10 +150,10 @@ contract VoterRegistry {
         return voterList.length;
     }
 
-    function getVotersPaginated(uint256 _offset, uint256 _limit)
-        external view
-        returns (Voter[] memory page)
-    {
+    function getVotersPaginated(
+        uint256 _offset,
+        uint256 _limit
+    ) external view returns (Voter[] memory page) {
         uint256 total = voterList.length;
         if (_offset >= total) return new Voter[](0);
 

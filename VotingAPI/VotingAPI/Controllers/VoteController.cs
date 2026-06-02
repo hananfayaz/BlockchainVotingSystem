@@ -9,7 +9,7 @@ namespace VotingAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = nameof(UserRole.Voter))]
     public class VoteController : ControllerBase
     {
         private readonly IVoteService voteService;

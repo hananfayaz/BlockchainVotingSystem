@@ -2,19 +2,54 @@ import hre from "hardhat";
 
 async function main() {
 
-  const ethers =
-    await hre.network.getOrCreate().then(n => n.ethers);
+    const ethers =
+        await hre.network.getOrCreate().then(n => n.ethers);
 
-  const votingAddress = "0xa16E02E87b7454126E5E10d957A927A7F5B5d2be";
+    // BallotFactory
+    const factory =
+        await ethers.getContractAt(
+            "BallotFactory",
+            "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
+        );
 
-  const voting =
-    await ethers.getContractAt("Voting", votingAddress);
+    // Ballot 0
+    const ballotInfo =
+        await factory.getBallotInfo(0);
 
-  const tx = await voting.vote(0);
+    const votingAddress =
+        ballotInfo.contractAddress;
 
-  await tx.wait();
+    console.log("Voting Address:");
+    console.log(votingAddress);
 
-  console.log("Vote cast successfully");
+    // Signer
+    const [voter] =
+        await ethers.getSigners();
+
+    console.log("Voter Wallet:");
+    console.log(voter.address);
+
+    // Voting contract
+    const voting =
+        await ethers.getContractAt(
+            "Voting",
+            votingAddress
+        );
+
+    const tx =
+        await voting.vote(
+            voter.address,
+            0
+        );
+
+    console.log("Tx:");
+    console.log(tx.hash);
+
+    const receipt =
+        await tx.wait();
+
+    console.log("Block:");
+    console.log(receipt?.blockNumber);
 }
 
 main().catch(console.error);

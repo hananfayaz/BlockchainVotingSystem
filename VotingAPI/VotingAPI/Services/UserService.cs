@@ -20,7 +20,7 @@ namespace VotingAPI.Services
         {
             var user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId) ?? throw new KeyNotFoundException("User not found");
 
-            var wallectConnected = await dbContext.Users.AnyAsync(u => u.EthAddress == ethAddress && u.UserId == userId);
+            var wallectConnected = await dbContext.Users.AnyAsync(u => u.EthAddress == ethAddress && u.UserId != userId);
 
             if (wallectConnected)
                 throw new InvalidOperationException("Wallet already connected");

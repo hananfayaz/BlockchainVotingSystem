@@ -93,17 +93,11 @@ namespace VotingAPI.Services
             if (election.Candidates.Count < 2)
                 throw new ArgumentException("At least 2 candidates required");
 
-            if (election.EndTime <= DateTime.UtcNow)
-                throw new ArgumentException("Cannot activate already expired election");
-
             if (election.StartTime > DateTime.UtcNow)
                 throw new ArgumentException("Voting cannot be started before its scheduled start time");
 
-            foreach (var voter in election.Voters)
-            {
-                if (string.IsNullOrWhiteSpace(voter.User.EthAddress))
-                    throw new ArgumentException($"Voter {voter.User.FullName} has no wallet connected");
-            }
+            if (election.EndTime <= DateTime.UtcNow)
+                throw new ArgumentException("Cannot activate already expired election");
 
             var candidateList = election.Candidates.OrderBy(c => c.CreatedAt).ToList();
             var candidates = candidateList.Select(c => c.Name).ToList();

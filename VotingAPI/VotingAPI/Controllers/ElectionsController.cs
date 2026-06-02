@@ -81,7 +81,7 @@ namespace VotingAPI.Controllers
         public async Task<IActionResult> GetCandidates(Guid electionId)
         {
             var result = await electionService.GetCandidates(electionId);
-            return Ok(new { message = result });
+            return Ok( result );
         }
     }
 }

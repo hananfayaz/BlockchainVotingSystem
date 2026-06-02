@@ -12,31 +12,36 @@ namespace VotingAPI.Services
     public class VoterService : IVoterService
     {
         private readonly VotingDbContext dbContext;
+        private readonly IBlockchainService blockchainService;
 
-        public VoterService(VotingDbContext dbContext)
+        public VoterService(VotingDbContext dbContext, IBlockchainService blockchainService)
         {
             this.dbContext = dbContext;
+            this.blockchainService = blockchainService;
         }
 
         public async Task<string> RegisterVoter(Guid ElectionId, Guid UserId)
         {
-            var election = await dbContext.Elections.FirstOrDefaultAsync(e => e.ElectionId == ElectionId) ?? throw new KeyNotFoundException("Election not found");
+            var election = await dbContext.Elections.Include(e => e.Voters).ThenInclude(v => v.User).FirstOrDefaultAsync(e => e.ElectionId == ElectionId) ?? throw new KeyNotFoundException("Election not found");
 
             if (election.Status != ElectionStatus.Draft)
                 throw new ArgumentException("Voter can be registered only in draft election");
 
             if (election.StartTime <= DateTime.UtcNow)
-                throw new ArgumentException("Cannot register voter for active election");
+                throw new ArgumentException("Election has already been started");
 
             if (election.EndTime <= DateTime.UtcNow)
-                throw new ArgumentException("Cannot register voter for expired election");
+                throw new ArgumentException("Election has already been ended");
 
             var user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserId == UserId) ?? throw new KeyNotFoundException("Voter not found");
 
             if (user.Role != UserRole.Voter)
                 throw new ArgumentException("Only voter is eligible to vote");
 
-            var voterExists = await dbContext.Voters.AnyAsync(v => v.UserId == UserId);
+            if (string.IsNullOrWhiteSpace(user.EthAddress))
+                throw new ArgumentException("No wallet connected");
+
+            var voterExists = await dbContext.Voters.AnyAsync(v => v.UserId == UserId && v.ElectionId == ElectionId);
 
             if (voterExists)
                 throw new InvalidOperationException("Voter already exists");
@@ -71,7 +76,7 @@ namespace VotingAPI.Services
                 HasVoted = v.HasVoted,
                 RegisteredAt = v.RegisteredAt
             }).ToListAsync();
-            
+
             return voters;
         }
     }
