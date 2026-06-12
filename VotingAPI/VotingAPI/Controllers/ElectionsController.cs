@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
@@ -24,7 +24,10 @@ namespace VotingAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllElections()
         {
-            var elections = await electionService.GetAllElections();
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Guid? currentUserId = userIdClaim != null ? Guid.Parse(userIdClaim) : null;
+
+            var elections = await electionService.GetAllElections(currentUserId);
             return Ok(new { elections });
         }
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using VotingAPI.Models.DTOs.Auth;
 using VotingAPI.Services.Interfaces;
 
@@ -25,7 +25,15 @@ namespace VotingAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequestDTO)
         {
-            var token = await authService.Login(loginRequestDTO);
+            var message = await authService.Login(loginRequestDTO);
+
+            return Ok(new { requiresOtp = true, message, email = loginRequestDTO.Email });
+        }
+
+        [HttpPost("verify-login-otp")]
+        public async Task<IActionResult> VerifyLoginOtp([FromBody] VerifyOtpDTO verifyOtpDTO)
+        {
+            var token = await authService.VerifyLoginOtp(verifyOtpDTO);
 
             Response.Cookies.Append(key: "access_token", value: token, options: new CookieOptions
             {
@@ -35,7 +43,6 @@ namespace VotingAPI.Controllers
                 Expires = DateTime.UtcNow.AddDays(1)
             });
 
-            //return Ok(new { message = "Login successful" });
             return Ok(token);
         }
 
@@ -50,6 +57,20 @@ namespace VotingAPI.Controllers
         public async Task<IActionResult> ResendOtp([FromBody] ResendOtpDTO resendOtpDTO)
         {
             var result = await authService.ResendOtp(resendOtpDTO);
+            return Ok(new { message = result });
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDTO forgotPasswordRequestDTO)
+        {
+            var result = await authService.ForgotPassword(forgotPasswordRequestDTO);
+            return Ok(new { message = result });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDTO resetPasswordRequestDTO)
+        {
+            var result = await authService.ResetPassword(resetPasswordRequestDTO);
             return Ok(new { message = result });
         }
     }

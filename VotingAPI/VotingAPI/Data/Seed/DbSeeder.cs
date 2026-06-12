@@ -17,7 +17,7 @@ namespace VotingAPI.Data.Seed
             var admin = new User
             {
                 FullName = "System Admin",
-                Email = "admin@example.com",
+                Email = "chipichapa422@gmail.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin@123"),
                 Role = UserRole.Admin,
                 IsVerified = true,

@@ -61,6 +61,16 @@ namespace VotingAPI.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("AutoActivate")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("AutoActivateFailReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<bool>("AutoClose")
+                        .HasColumnType("bit");
+
                     b.Property<string>("ContractAddress")
                         .HasMaxLength(42)
                         .HasColumnType("nvarchar(42)");

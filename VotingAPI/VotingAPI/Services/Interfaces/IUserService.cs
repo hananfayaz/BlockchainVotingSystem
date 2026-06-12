@@ -1,4 +1,4 @@
-﻿using VotingAPI.Models.DTOs.User;
+using VotingAPI.Models.DTOs.User;
 
 namespace VotingAPI.Services.Interfaces
 {
@@ -6,5 +6,6 @@ namespace VotingAPI.Services.Interfaces
     {
         Task<List<UserResponseDTO>> GetAllUsers();
         Task<string> ConnectWallet(Guid userId, string ethAddress);
+        Task<string> ChangePassword(Guid userId, ChangePasswordRequestDTO changePasswordRequestDTO);
     }
 }

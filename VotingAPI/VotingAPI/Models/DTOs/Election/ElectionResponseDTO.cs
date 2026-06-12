@@ -1,4 +1,4 @@
-﻿using VotingAPI.Models.Enums;
+using VotingAPI.Models.Enums;
 
 namespace VotingAPI.Models.DTOs.Election
 {
@@ -10,5 +10,9 @@ namespace VotingAPI.Models.DTOs.Election
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public ElectionStatus Status { get; set; }
+        public bool AutoActivate { get; set; }
+        public string? AutoActivateFailReason { get; set; }
+        public bool AutoClose { get; set; }
+        public bool HasVoted { get; set; }
     }
 }

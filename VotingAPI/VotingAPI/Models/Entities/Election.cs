@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using VotingAPI.Models.Enums;
 
@@ -27,6 +27,13 @@ namespace VotingAPI.Models.Entities
 
         [Required]
         public ElectionStatus Status { get; set; } // By default, it will be set to "Draft" when the election is created, and will be updated to "Active" when the election starts, and "Closed" when the election ends.
+
+        public bool AutoActivate { get; set; } // If true, the election will be automatically activated when the start time arrives.
+
+        public bool AutoClose { get; set; } // If true, the election will be automatically closed when the end time arrives.
+
+        [MaxLength(500)]
+        public string? AutoActivateFailReason { get; set; } // Populated when auto-activation fails (e.g., not enough candidates)
 
         public DateTime CreatedAt { get; set; }
 

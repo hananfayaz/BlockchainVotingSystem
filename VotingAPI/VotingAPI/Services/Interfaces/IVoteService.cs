@@ -4,6 +4,8 @@ namespace VotingAPI.Services.Interfaces
 {
     public interface IVoteService
     {
+        Task<string> SendVoteOtp(Guid userId, VotePrepareRequestDTO votePrepareRequestDTO);
+
         Task<VotePrepareResponseDTO> PrepareVote(Guid userId, VotePrepareRequestDTO votePrepareRequestDTO);
 
         Task ConfirmVote(Guid userId, ConfirmVoteDTO confirmVoteDTO);

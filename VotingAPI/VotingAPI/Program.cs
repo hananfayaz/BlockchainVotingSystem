@@ -23,6 +23,8 @@ builder.Services.AddScoped<IElectionService, ElectionService>();
 builder.Services.AddScoped<IVoteService, VoteService>();
 builder.Services.AddScoped<IResultService, ResultService>();
 
+builder.Services.AddHostedService<ElectionAutoActivateService>();
+
 builder.Services.AddControllers();
 
 // Forces all API routes (like [controller]) to generate as lowercase URLs globally

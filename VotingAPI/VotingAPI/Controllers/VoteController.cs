@@ -19,6 +19,15 @@ namespace VotingAPI.Controllers
             this.voteService = voteService;
         }
 
+        [HttpPost("send-otp")]
+        public async Task<IActionResult> SendVoteOtp([FromBody] VotePrepareRequestDTO votePrepareRequestDTO)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException("Not logged in");
+
+            var result = await voteService.SendVoteOtp(Guid.Parse(userId!), votePrepareRequestDTO);
+            return Ok(new { message = result });
+        }
+
         [HttpPost("prepare")]
         public async Task<IActionResult> PrepareVote([FromBody] VotePrepareRequestDTO votePrepareRequestDTO)
         {

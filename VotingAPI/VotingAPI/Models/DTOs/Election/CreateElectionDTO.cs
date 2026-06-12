@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace VotingAPI.Models.DTOs.Election
 {
@@ -16,5 +16,8 @@ namespace VotingAPI.Models.DTOs.Election
 
         [Required(ErrorMessage = "End time is required.")]
         public DateTime EndTime { get; set; }
+
+        public bool AutoActivate { get; set; }
+        public bool AutoClose { get; set; }
     }
 }

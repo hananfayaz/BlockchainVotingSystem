@@ -1,4 +1,10 @@
 import hre from "hardhat";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function main() {
 
@@ -161,6 +167,45 @@ async function main() {
   console.log("ResultAggregator:", aggregatorAddress);
 
   console.log("========================================");
+
+  // =====================================================
+  // Update appsettings.json in the backend project
+  // =====================================================
+
+  const appsettingsPath = path.resolve(
+    __dirname,
+    "../../VotingAPI/VotingAPI/appsettings.json"
+  );
+
+  try {
+    const raw = fs.readFileSync(appsettingsPath, "utf-8");
+    const appsettings = JSON.parse(raw);
+
+    appsettings.BlockchainSettings = {
+      ...appsettings.BlockchainSettings,
+      AccessControlAddress: accessControlAddress,
+      ZKVerifierAddress: zkVerifierAddress,
+      VoterRegistryAddress: registryAddress,
+      BallotFactoryAddress: ballotFactoryAddress,
+      ResultAggregatorAddress: aggregatorAddress,
+    };
+
+    fs.writeFileSync(
+      appsettingsPath,
+      JSON.stringify(appsettings, null, 2) + "\n",
+      "utf-8"
+    );
+
+    console.log(
+      "\n✅ appsettings.json updated at:",
+      appsettingsPath
+    );
+  } catch (err) {
+    console.error(
+      "\n❌ Failed to update appsettings.json:",
+      err
+    );
+  }
 }
 
 main().catch((error) => {

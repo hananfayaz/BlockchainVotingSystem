@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using VotingAPI.Data;
 using VotingAPI.Helpers;
 using VotingAPI.Models.DTOs.Auth;
@@ -98,9 +98,9 @@ namespace VotingAPI.Services
 
         public async Task<string> Login(LoginRequestDTO loginRequestDTO)
         {
-            var user = await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == loginRequestDTO.Email) ?? throw new KeyNotFoundException("User not found");
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == loginRequestDTO.Email) ?? throw new KeyNotFoundException("User not found");
 
-            if (user == null || !BCrypt.Net.BCrypt.Verify(loginRequestDTO.Password, user.PasswordHash))
+            if (!BCrypt.Net.BCrypt.Verify(loginRequestDTO.Password, user.PasswordHash))
                 throw new InvalidOperationException("Invalid credentials.");
 
             if (!user.IsVerified)
@@ -109,9 +109,76 @@ namespace VotingAPI.Services
             if (loginRequestDTO.Role != user.Role)
                 throw new InvalidOperationException("Invalid role.");
 
+            var otp = EmailHelper.GetOtp();
+            var body = EmailHelper.GetBody(user.FullName, otp);
+
+            user.OtpCode = otp;
+            user.OtpExpiry = DateTime.UtcNow.AddMinutes(5);
+
+            await dbContext.SaveChangesAsync();
+
+            await emailService.SendEmailAsync(toEmail: user.Email, subject: "Login OTP Verification", body: body);
+
+            return "OTP sent to your email.";
+        }
+
+        public async Task<string> VerifyLoginOtp(VerifyOtpDTO verifyOtpDTO)
+        {
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == verifyOtpDTO.Email) ?? throw new KeyNotFoundException("User not found.");
+
+            if (user.OtpCode != verifyOtpDTO.Otp)
+                throw new InvalidOperationException("Invalid OTP.");
+
+            if (user.OtpExpiry == null || user.OtpExpiry < DateTime.UtcNow)
+                throw new InvalidOperationException("OTP has expired.");
+
+            user.OtpCode = null;
+            user.OtpExpiry = null;
+
+            await dbContext.SaveChangesAsync();
+
             var token = jwtService.GenerateToken(user);
 
             return token;
+        }
+
+        public async Task<string> ForgotPassword(ForgotPasswordRequestDTO forgotPasswordRequestDTO)
+        {
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == forgotPasswordRequestDTO.Email) ?? throw new KeyNotFoundException("User with this email does not exist.");
+
+            var otp = EmailHelper.GetOtp();
+            var body = EmailHelper.GetBody(user.FullName, otp);
+
+            user.OtpCode = otp;
+            user.OtpExpiry = DateTime.UtcNow.AddMinutes(10);
+
+            await dbContext.SaveChangesAsync();
+
+            await emailService.SendEmailAsync(toEmail: user.Email, subject: "Password Reset OTP", body: body);
+
+            return "Password reset OTP sent to your email.";
+        }
+
+        public async Task<string> ResetPassword(ResetPasswordRequestDTO resetPasswordRequestDTO)
+        {
+            var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == resetPasswordRequestDTO.Email) ?? throw new KeyNotFoundException("User not found.");
+
+            if (user.OtpCode != resetPasswordRequestDTO.Otp)
+                throw new InvalidOperationException("Invalid OTP.");
+
+            if (user.OtpExpiry == null || user.OtpExpiry < DateTime.UtcNow)
+                throw new InvalidOperationException("OTP has expired.");
+
+            if (user.PasswordHash == BCrypt.Net.BCrypt.HashPassword(resetPasswordRequestDTO.NewPassword))
+                throw new ArgumentException("New password cannot be the same as the old password.");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(resetPasswordRequestDTO.NewPassword);
+            user.OtpCode = null;
+            user.OtpExpiry = null;
+
+            await dbContext.SaveChangesAsync();
+
+            return "Password reset successfully. You can now login with your new password.";
         }
     }
 }

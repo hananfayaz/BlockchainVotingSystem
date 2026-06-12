@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using VotingAPI.Data;
 using VotingAPI.Models.DTOs.Election;
 using VotingAPI.Models.Entities;
@@ -18,17 +18,53 @@ namespace VotingAPI.Services
             this.blockchainService = blockchainService;
         }
 
-        public async Task<List<ElectionResponseDTO>> GetAllElections()
+        public async Task<List<ElectionResponseDTO>> GetAllElections(Guid? currentUserId = null)
         {
-            var elections = await dbContext.Elections.AsNoTracking().Select(e => new ElectionResponseDTO
+            var query = dbContext.Elections.AsNoTracking();
+
+            List<ElectionResponseDTO> elections;
+
+            if (currentUserId.HasValue)
             {
-                ElectionId = e.ElectionId,
-                Title = e.Title,
-                Description = e.Description ?? string.Empty,
-                StartTime = e.StartTime,
-                EndTime = e.EndTime,
-                Status = e.Status
-            }).ToListAsync();
+                elections = await query
+                    .GroupJoin(
+                        dbContext.Voters.Where(v => v.UserId == currentUserId.Value),
+                        e => e.ElectionId,
+                        v => v.ElectionId,
+                        (e, voters) => new { Election = e, Voters = voters })
+                    .SelectMany(
+                        x => x.Voters.DefaultIfEmpty(),
+                        (x, voter) => new ElectionResponseDTO
+                        {
+                            ElectionId = x.Election.ElectionId,
+                            Title = x.Election.Title,
+                            Description = x.Election.Description ?? string.Empty,
+                            StartTime = x.Election.StartTime,
+                            EndTime = x.Election.EndTime,
+                            Status = x.Election.Status,
+                            AutoActivate = x.Election.AutoActivate,
+                            AutoActivateFailReason = x.Election.AutoActivateFailReason,
+                            AutoClose = x.Election.AutoClose,
+                            HasVoted = voter != null && voter.HasVoted
+                        })
+                    .ToListAsync();
+            }
+            else
+            {
+                elections = await query.Select(e => new ElectionResponseDTO
+                {
+                    ElectionId = e.ElectionId,
+                    Title = e.Title,
+                    Description = e.Description ?? string.Empty,
+                    StartTime = e.StartTime,
+                    EndTime = e.EndTime,
+                    Status = e.Status,
+                    AutoActivate = e.AutoActivate,
+                    AutoActivateFailReason = e.AutoActivateFailReason,
+                    AutoClose = e.AutoClose,
+                    HasVoted = false
+                }).ToListAsync();
+            }
 
             return elections;
         }
@@ -44,7 +80,10 @@ namespace VotingAPI.Services
                 Description = election.Description ?? string.Empty,
                 StartTime = election.StartTime,
                 EndTime = election.EndTime,
-                Status = election.Status
+                Status = election.Status,
+                AutoActivate = election.AutoActivate,
+                AutoActivateFailReason = election.AutoActivateFailReason,
+                AutoClose = election.AutoClose
             };
 
             return electionResponse;
@@ -73,6 +112,8 @@ namespace VotingAPI.Services
                 StartTime = createElectionDTO.StartTime,
                 EndTime = createElectionDTO.EndTime,
                 Status = ElectionStatus.Draft,
+                AutoActivate = createElectionDTO.AutoActivate,
+                AutoClose = createElectionDTO.AutoClose,
                 CreatedBy = createdBy,
                 CreatedAt = DateTime.UtcNow
             };
@@ -92,6 +133,9 @@ namespace VotingAPI.Services
 
             if (election.Candidates.Count < 2)
                 throw new ArgumentException("At least 2 candidates required");
+
+            if (election.Voters.Count < 1)
+                throw new ArgumentException("At least 1 voter required");
 
             if (election.StartTime > DateTime.UtcNow)
                 throw new ArgumentException("Voting cannot be started before its scheduled start time");

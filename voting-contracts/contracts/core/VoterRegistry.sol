@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 import "../security/AccessControl.sol";
 
 contract VoterRegistry {
-    // ─── Types ───────────────────────────────────────────────
     enum VoterStatus {
         Unregistered,
         Pending,
@@ -20,7 +19,6 @@ contract VoterRegistry {
         uint256 approvedAt;
     }
 
-    // ─── State ───────────────────────────────────────────────
     AccessControl public acl;
 
     mapping(address => Voter) private voters;
@@ -28,7 +26,6 @@ contract VoterRegistry {
 
     mapping(address => mapping(address => bool)) private ballotEligibility;
 
-    // ─── Events ──────────────────────────────────────────────
     event VoterRegistered(address indexed voter, string name);
     event VoterApproved(address indexed voter, address indexed approvedBy);
     event VoterRevoked(address indexed voter, address indexed revokedBy);
@@ -38,7 +35,6 @@ contract VoterRegistry {
         bool eligible
     );
 
-    // ─── Modifiers ───────────────────────────────────────────
     modifier onlyAdmin() {
         require(acl.hasRole(acl.ADMIN(), msg.sender), "Registry: not admin");
         _;
@@ -52,12 +48,11 @@ contract VoterRegistry {
         _;
     }
 
-    // ─── Constructor ─────────────────────────────────────────
     constructor(address _acl) {
         acl = AccessControl(_acl);
     }
 
-    // ─── Registration ────────────────────────────────────────
+    // AUTO-APPROVE REGISTRATION
     function register(string calldata _name) external {
         require(
             voters[msg.sender].status == VoterStatus.Unregistered,
@@ -68,16 +63,17 @@ contract VoterRegistry {
         voters[msg.sender] = Voter({
             wallet: msg.sender,
             name: _name,
-            status: VoterStatus.Pending,
+            status: VoterStatus.Approved,
             registeredAt: block.timestamp,
-            approvedAt: 0
+            approvedAt: block.timestamp
         });
 
         voterList.push(msg.sender);
+
         emit VoterRegistered(msg.sender, _name);
+        emit VoterApproved(msg.sender, msg.sender);
     }
 
-    // ─── Admin: approval / revocation ────────────────────────
     function approveVoter(address _voter) external onlyAdmin {
         require(voters[_voter].status == VoterStatus.Pending, "Not pending");
         voters[_voter].status = VoterStatus.Approved;
@@ -102,7 +98,6 @@ contract VoterRegistry {
         emit VoterRevoked(_voter, msg.sender);
     }
 
-    // ─── Per-ballot eligibility ───────────────────────────────
     function setEligibility(
         address ballot,
         address _voter,
@@ -112,7 +107,6 @@ contract VoterRegistry {
         emit EligibilitySet(ballot, _voter, _eligible);
     }
 
-    // ─── View functions ──────────────────────────────────────
     function isApproved(address _voter) external view returns (bool) {
         return voters[_voter].status == VoterStatus.Approved;
     }
@@ -122,11 +116,15 @@ contract VoterRegistry {
         address _voter
     ) external view returns (bool) {
         VoterStatus s = voters[_voter].status;
-        if (s == VoterStatus.Unregistered || s == VoterStatus.Revoked)
+
+        if (s == VoterStatus.Revoked)
             return false;
-        if (s == VoterStatus.Pending) return false;
+
+        if (s == VoterStatus.Pending)
+            return false;
 
         bool hasOverride = ballotEligibility[_ballot][_voter];
+
         return hasOverride || s == VoterStatus.Approved;
     }
 
@@ -143,7 +141,13 @@ contract VoterRegistry {
         )
     {
         Voter storage v = voters[_voter];
-        return (v.name, v.status, v.registeredAt, v.approvedAt);
+
+        return (
+            v.name,
+            v.status,
+            v.registeredAt,
+            v.approvedAt
+        );
     }
 
     function getVoterCount() external view returns (uint256) {
@@ -155,12 +159,19 @@ contract VoterRegistry {
         uint256 _limit
     ) external view returns (Voter[] memory page) {
         uint256 total = voterList.length;
-        if (_offset >= total) return new Voter[](0);
+
+        if (_offset >= total) {
+            return new Voter[](0);
+        }
 
         uint256 end = _offset + _limit;
-        if (end > total) end = total;
+
+        if (end > total) {
+            end = total;
+        }
 
         page = new Voter[](end - _offset);
+
         for (uint256 i = _offset; i < end; i++) {
             page[i - _offset] = voters[voterList[i]];
         }

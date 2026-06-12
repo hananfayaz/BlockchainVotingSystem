@@ -36,6 +36,8 @@ namespace VotingAPI.Services
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Role = UserRole.ElectionOfficer,
                 IsVerified = false,
+                OtpCode = otp,
+                OtpExpiry = DateTime.UtcNow.AddMinutes(10),
                 CreatedAt = DateTime.UtcNow
             };
 

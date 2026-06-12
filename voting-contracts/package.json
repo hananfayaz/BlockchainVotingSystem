@@ -13,11 +13,11 @@
     "chai": "^6.2.2",
     "ethers": "^6.16.0",
     "forge-std": "github:foundry-rs/forge-std#v1.9.4",
-    "hardhat": "^3.4.4",
+    "hardhat": "^3.8.0",
     "mocha": "^11.7.5",
     "typescript": "~5.8.0"
   },
   "scripts": {
-  "compile": "npx hardhat compile && Nethereum.Generator.Console generate from-config -cfg ./nethereum-gen.json"
-}
+    "compile": "npx hardhat compile && Nethereum.Generator.Console generate from-config -cfg ./nethereum-gen.json"
+  }
 }

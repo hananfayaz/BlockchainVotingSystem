@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using VotingAPI.Models.DTOs.User;
@@ -18,7 +18,7 @@ namespace VotingAPI.Controllers
             this.userService = userService;
         }
 
-        [Authorize(Roles = nameof(UserRole.Admin))]
+        [Authorize(Roles = $"{nameof(UserRole.Admin)},{nameof(UserRole.ElectionOfficer)}")]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -33,6 +33,16 @@ namespace VotingAPI.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException("User not logged-in");
 
             var result = await userService.ConnectWallet(Guid.Parse(userId), ethAddress);
+            return Ok(new { message = result });
+        }
+
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDTO changePasswordRequestDTO)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new UnauthorizedAccessException("User not logged-in");
+
+            var result = await userService.ChangePassword(Guid.Parse(userId), changePasswordRequestDTO);
             return Ok(new { message = result });
         }
     }
