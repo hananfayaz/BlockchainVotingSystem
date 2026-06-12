@@ -12,8 +12,8 @@ using VotingAPI.Data;
 namespace VotingAPI.Data.Migrations
 {
     [DbContext(typeof(VotingDbContext))]
-    [Migration("20260612075945_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260612132455_VotingMigration")]
+    partial class VotingMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
