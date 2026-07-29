@@ -1,58 +1,57 @@
-# Blockchain Based Voting System
+# Sample Hardhat 3 Beta Project (`mocha` and `ethers`)
 
-A secure and decentralized electronic voting system developed as a **final-semester MCA project**. This application leverages blockchain technology to provide a transparent, tamper-resistant, and verifiable voting process through smart contracts while delivering a modern web-based user experience.
+This project showcases a Hardhat 3 Beta project using `mocha` for tests and the `ethers` library for Ethereum interactions.
 
-## Overview
+To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
 
-The Blockchain Based Voting System is designed to enhance the security and trustworthiness of digital elections by storing votes on a blockchain, ensuring that each vote is immutable and auditable. The system integrates a React frontend, a .NET Core backend, Solidity smart contracts, and SQL Server to provide a complete end-to-end voting solution.
+## Project Overview
 
-## Features
+This example project includes:
 
-* Secure user authentication and authorization.
-* Blockchain-based vote recording using Solidity smart contracts.
-* Tamper-resistant and transparent voting process.
-* One vote per eligible voter.
-* Real-time vote validation and transaction processing.
-* Administrative dashboard for election management.
-* Responsive and user-friendly interface.
-* Secure REST APIs for communication between the frontend and backend.
-* SQL Server integration for application and user management data.
+- A simple Hardhat configuration file.
+- Foundry-compatible Solidity unit tests.
+- TypeScript integration tests using `mocha` and ethers.js
+- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
 
-## Technology Stack
+## Usage
 
-* **Frontend:** React
-* **Backend:** .NET Core Web API
-* **Blockchain:** Solidity Smart Contracts
-* **Database:** SQL Server
-* **API:** RESTful APIs
+### Running Tests
 
-## Project Objectives
+To run all the tests in the project, execute the following command:
 
-* Build a secure electronic voting platform.
-* Prevent vote manipulation and duplicate voting.
-* Ensure transparency through blockchain technology.
-* Maintain voter confidentiality while enabling result verification.
-* Demonstrate the practical integration of blockchain with modern web technologies.
-
-## Repository Structure
-
-```text
-├── frontend/          # React application
-├── backend/           # .NET Core Web API
-├── smart-contracts/   # Solidity contracts
-├── database/          # SQL scripts and database objects
-└── docs/              # Project documentation
+```shell
+npx hardhat test
 ```
 
-## Future Enhancements
+You can also selectively run the Solidity or `mocha` tests:
 
-* Multi-factor authentication.
-* Wallet-based voter identity verification.
-* Real-time blockchain explorer integration.
-* Mobile application support.
-* Deployment on a public Ethereum-compatible blockchain.
-* Automated testing and CI/CD pipeline.
+```shell
+npx hardhat test solidity
+npx hardhat test mocha
+```
 
-## License
+### Make a deployment to Sepolia
 
-This project was developed for academic purposes as part of the final semester of the Master of Computer Applications (MCA) program.
+This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
+
+To run the deployment to a local chain:
+
+```shell
+npx hardhat ignition deploy ignition/modules/Counter.ts
+```
+
+To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
+
+You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
+
+To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
+
+```shell
+npx hardhat keystore set SEPOLIA_PRIVATE_KEY
+```
+
+After setting the variable, you can run the deployment with the Sepolia network:
+
+```shell
+npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
+```
