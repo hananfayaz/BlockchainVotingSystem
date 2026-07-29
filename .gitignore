@@ -1,0 +1,34 @@
+# ─── .NET / Visual Studio ────────────────────────────────────────────────────
+
+## Build artifacts — never commit these
+**/bin/
+**/obj/
+
+## Publish output
+VotingAPI/VotingAPI/publish/
+VotingAPI/VotingAPI/publish.zip
+VotingAPI/VotingAPI/publish_deploy.zip
+VotingAPI/VotingAPI/publish_deploy_local.zip
+
+## Test flow scripts (local testing only)
+voting-web/test_flow.js
+voting-web/test_flow.cjs
+
+## Visual Studio
+VotingAPI/.vs/
+*.user
+*.suo
+
+## ─── SECRETS — NEVER COMMIT THESE ──────────────────────────────────────────
+
+# appsettings.Development.json contains real DB passwords, private keys, and SMTP credentials.
+# Use environment variables or dotnet user-secrets in CI/production.
+VotingAPI/VotingAPI/appsettings.Development.json
+
+# Also ignore any local override files
+VotingAPI/VotingAPI/appsettings.Local.json
+VotingAPI/VotingAPI/appsettings.*.json
+!VotingAPI/VotingAPI/appsettings.json
+
+# ─── Node (shared) ───────────────────────────────────────────────────────────
+node_modules/
